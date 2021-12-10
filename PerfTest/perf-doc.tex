@@ -1,0 +1,156 @@
+\documentclass[11pt]{article}
+\usepackage{epsfig}
+\usepackage{times}
+\usepackage{graphics}
+\usepackage{float}
+\usepackage{alltt}
+\usepackage{fancyheadings}
+\usepackage[colorlinks]{hyperref}
+\raggedbottom
+
+\pagestyle{fancyplain}
+
+\newcommand{\todothis}[1]{\vspace{0.2cm}\hspace{-2cm}\addcontentsline{tdo}{howto}{#1}\textbf{\underline{#1}}\nopagebreak}
+
+\newcommand{\note}[1]{\vspace{0.2cm}\hspace{-2cm}\makebox[2cm][l]{\textbf{\underline{Note:}}}{#1}}
+
+\newcommand{\sv}{ServPoET}
+\newsavebox{\savepar}
+\newenvironment{boxit}{\begin{lrbox}{\savepar}
+    \begin{minipage}[b]{\linewidth}\footnotesize}
+    {\end{minipage}\end{lrbox}\begin{center}\fbox{\usebox{\savepar}}\end{center}}
+
+\newenvironment{boxfig}{\begin{lrbox}{\savepar}
+    \begin{minipage}[b]{\linewidth}}
+    {\end{minipage}\end{lrbox}\begin{center}\fbox{\usebox{\savepar}}\end{center}}
+\ifx\pdfoutput\undefined
+\newcommand{\eps}{eps}
+\else
+\newcommand{\eps}{pdf}
+\fi
+
+\sloppy
+
+\setlength{\footrulewidth}{0.4pt}
+\setlength{\plainfootrulewidth}{0.4pt}
+\lhead[\fancyplain{}\thepage]{\fancyplain{}\rightmark}
+\rhead[\fancyplain{}\leftmark]{\fancyplain{}\thepage}
+\cfoot[Fine Point Technologies, Inc.]{Roaring Penguin Software Inc.}
+\rfoot{\fancyplain{\thepage}{}}
+
+\title{\sv{} Performance Testing}
+\author{Dianne Skoll}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+
+This document describes how to set up a performance-testing network
+to stress-test the \sv{} PPPoE server.
+
+\section{Performance Server}
+
+The performance server is a dedicated Linux machine which accepts
+connections from clients, and transmits data as fast as it can to
+each client.  This machine should be a very fast machine with a lot
+of memory; it should be able to saturate a 100Mb/s Ethernet link.
+
+To set up the Performance Server:
+\begin{enumerate}
+\item Copy the contents of the PerfTest directory to the machine.
+\item Type \texttt{make} to build the software.
+\item Configure the primary interface of the Performance Server (\texttt{eth0})
+  to have IP address 192.168.2.2 with netmask 255.255.255.0.  Do this
+  as follows:
+\begin{verbatim}
+ifconfig eth0 192.168.2.2 up
+\end{verbatim}
+\item Configure the default gateway of the Performance Server to be
+  192.168.2.1.  Do it as follows:
+\begin{verbatim}
+route add default gw 192.168.2.1
+\end{verbatim}
+
+  Once you have configured the routing, the output of \texttt{/sbin/route~-n}
+  should look like this:
+{\scriptsize
+\begin{verbatim}
+Destination   Gateway     Genmask       Flags Metric Ref Use Iface
+127.0.0.0     0.0.0.0     255.0.0.0     U     0      0     0 lo
+192.168.2.0   0.0.0.0     255.255.255.0 U     0      0     0 eth0
+0.0.0.0       192.168.2.1 0.0.0.0       UG    0      0     0 eth0
+\end{verbatim}
+}
+\item Configure \sv{} to hand out IP addresses to PPPoE clients starting
+  at 192.168.10.1.
+\end{enumerate}
+
+\section{\sv{}}
+
+To set up \sv{}:
+\begin{enumerate}
+\item Configure \texttt{eth0} as a normal IP interface with
+address 192.168.2.1.  Connect \texttt{eth0} on \sv{} to \texttt{eth0}
+on the Performance Server with a crossover cable or via a hub.
+\item Configure \texttt{eth1} to be a PPPoE interface with no IP
+  address.
+\item Log in to \sv{} as root and manually add a network route for the network
+  192.168.43.0/24:
+
+  \mbox{\texttt{route add -net 192.168.43.0 netmask 255.255.255.0 dev eth0}}
+\end{enumerate}
+
+\section{Performance Clients}
+
+The performance clients should be fairly fast Linux machines.  Ideally,
+they should support kernel-mode PPPoE, but it is possible to use
+generic Red Hat 7.2 machines with user-mode PPPoE.  To set up the
+clients:
+\begin{enumerate}
+\item Make sure the PPP version is 2.4 or better.  Red Hat 7.2 comes with
+  a good version.
+\item Delete the \texttt{/etc/ppp/options} file.
+\item Download, compile and install the latest rp-pppoe package from
+  my Web site.  Do not use the rp-pppoe package which comes with Red Hat
+  7.2; Red Hat broke it in some important ways.
+\item Run \texttt{pppoe-setup} to configure the PPPoE connection (user-name,
+  password, etc.)
+\item Copy the contents of the PerfTest directory to the client and
+  run \texttt{make}.
+\end{enumerate}
+
+Once the machines are set up, the network will look like Figure~\ref{fig:net}.
+\begin{figure}[htbp]
+  \begin{center}
+    \epsfig{file=setup.\eps,width=\textwidth}
+    \caption{Network Setup}
+    \label{fig:net}
+  \end{center}
+\end{figure}
+\section{Running the Test}
+
+Each client will make NCONN connections to the server.  Edit the
+shell scripts \texttt{run-server.sh} and \texttt{run-client.sh}
+to set NCONN to the desired value.  I do not recommend a value
+higher than 50 connections per client.  The value of NCONN should
+be the same on the server and all the clients.
+
+On each client, edit \texttt{run-client.sh} to use the correct
+value for USER.  The password for the USER should be in
+\texttt{/etc/ppp/pap-secrets}.  If you ran \texttt{pppoe-setup}, this
+will be the case already.
+
+Start the server (as root) by changing to the Perftest directory and
+typing:
+\begin{verbatim}
+./run-server.sh
+\end{verbatim}
+
+On each client, log in as root, change to the Perftest directory and type:
+
+\begin{verbatim}
+./run-client.sh
+\end{verbatim}
+
+The log of client sessions will be placed in CLIENT-0.log, CLIENT-1.log, etc.
+\end{document}
