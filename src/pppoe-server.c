@@ -115,8 +115,9 @@ ClientSession *LastFreeSession = NULL;
 ClientSession *BusySessions = NULL;
 
 /* Interfaces we're listening on */
-Interface interfaces[MAX_INTERFACES];
+Interface *interfaces = NULL;
 int NumInterfaces = 0;
+int MaxInterfaces = 0;
 
 /* The number of session slots */
 size_t NumSessionSlots;
@@ -1235,10 +1236,15 @@ main(int argc, char **argv)
 	exit(1);
     }
 
-    memset(interfaces, 0, sizeof(interfaces));
-
     /* Initialize syslog */
     openlog("pppoe-server", LOG_PID, LOG_DAEMON);
+
+    MaxInterfaces = INIT_INTERFACES;
+    interfaces = malloc(sizeof(*interfaces) * INIT_INTERFACES);
+    if (!interfaces) {
+	fprintf(stderr, "Out of memory allocating initial interfaces.\n");
+	exit(1);
+    }
 
     /* Default number of session slots */
     NumSessionSlots = DEFAULT_MAX_SESSIONS;
@@ -1406,10 +1412,14 @@ main(int argc, char **argv)
 	    break;
 
 	case 'I':
-	    if (NumInterfaces >= MAX_INTERFACES) {
-		fprintf(stderr, "Too many -I options (max %d)\n",
-			MAX_INTERFACES);
-		exit(EXIT_FAILURE);
+	    if (NumInterfaces >= MaxInterfaces) {
+		MaxInterfaces *= 2;
+		interfaces = realloc(interfaces, sizeof(*interfaces) * MaxInterfaces);
+		if (!interfaces) {
+		    fprintf(stderr, "Memory allocation failure trying to increase MaxInterfaces to %d\n",
+			    MaxInterfaces);
+		    exit(EXIT_FAILURE);
+		}
 	    }
 	    found = 0;
 	    for (i=0; i<NumInterfaces; i++) {
@@ -1419,6 +1429,7 @@ main(int argc, char **argv)
 		}
 	    }
 	    if (!found) {
+		memset(&interfaces[NumInterfaces], 0, sizeof(*interfaces));
 		strncpy(interfaces[NumInterfaces].name, optarg, IFNAMSIZ);
 		NumInterfaces++;
 	    }
