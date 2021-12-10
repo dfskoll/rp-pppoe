@@ -12,8 +12,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "../event.h"
+#include "event.h"
 #include <stdio.h>
+#include <time.h>
 
 void
 timerCallback(EventSelector *es,

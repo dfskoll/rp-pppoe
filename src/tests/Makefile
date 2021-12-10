@@ -1,7 +1,7 @@
 all: testevent
 
-testevent: testevent.o ../event.o
-	gcc -o testevent testevent.o ../event.o
+testevent: testevent.o ../libevent/event.o
+	gcc -o testevent testevent.o ../libevent/event.o
 
 testevent.o: testevent.c
-	gcc -c -o testevent.o -g testevent.c
+	gcc -c -I ../libevent -o testevent.o -g testevent.c
