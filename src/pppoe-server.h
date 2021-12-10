@@ -97,8 +97,8 @@ typedef struct ClientSessionStruct {
 /* Hack for daemonizing */
 #define CLOSEFD 64
 
-/* Max. number of interfaces to listen on */
-#define MAX_INTERFACES 64
+/* Initial Max. number of interfaces to listen on */
+#define INIT_INTERFACES 8
 
 /* Max. 64 sessions by default */
 #define DEFAULT_MAX_SESSIONS 64
@@ -107,7 +107,7 @@ typedef struct ClientSessionStruct {
 extern ClientSession *Sessions;
 
 /* Interfaces we're listening on */
-extern Interface interfaces[MAX_INTERFACES];
+extern Interface *interfaces;
 extern int NumInterfaces;
 
 /* The number of session slots */
