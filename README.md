@@ -1,4 +1,4 @@
-- a PPPoE client, relay and server for Linux
+# RP-PPPoE - a PPPoE client, relay and server for Linux
 
 RP-PPPoE is a PPPoE client, relay and server for Linux.  It can run completely
 in user-mode or used the Linux kernel's built-in PPPoE support.  Kernel-mode
