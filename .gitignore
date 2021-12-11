@@ -1,3 +1,5 @@
+*.bak
+*~
 scripts/pppoe-connect
 scripts/pppoe-init
 scripts/pppoe-init-suse
@@ -17,6 +19,7 @@ src/libevent/Doc/libevent.aux
 src/libevent/Doc/libevent.log
 src/libevent/Doc/libevent.out
 src/libevent/Doc/libevent.pdf
+src/libevent/Makefile
 src/libevent/event.o
 src/libevent/event_sig.o
 src/libevent/event_tcp.o
@@ -36,5 +39,3 @@ src/relay.o
 src/rp-pppoe.so
 src/tests/testevent
 src/tests/testevent.o
-*.bak
-*~
