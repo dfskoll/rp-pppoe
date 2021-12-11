@@ -117,10 +117,6 @@ typedef unsigned long UINT32_t;
 #error Could not find a 32-bit integer type
 #endif
 
-#ifdef HAVE_LINUX_IF_ETHER_H
-#include <linux/if_ether.h>
-#endif
-
 #include <netinet/in.h>
 
 #ifdef HAVE_NETINET_IF_ETHER_H
@@ -132,6 +128,10 @@ typedef unsigned long UINT32_t;
 #ifndef HAVE_SYS_DLPI_H
 #include <netinet/if_ether.h>
 #endif
+#endif
+
+#ifdef HAVE_LINUX_IF_ETHER_H
+#include <linux/if_ether.h>
 #endif
 
 
