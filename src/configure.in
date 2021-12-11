@@ -67,7 +67,7 @@ dnl If we were given "--enable-plugin" without a path, take a stab at where
 dnl the pppd source code might be.
 
 if test "$ac_cv_pluginpath" = "yes" ; then
-    for i in /usr/include /usr/local/include ; do
+    for i in /usr/include /usr/local/include `echo $CPATH | sed -e 's/:/ /g'`; do
 	if test -r $i/pppd/pppd.h; then
 	    ac_cv_pluginpath=$i
 	fi
