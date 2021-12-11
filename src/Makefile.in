@@ -207,12 +207,6 @@ install: all
 		$(install) -m 755 ../scripts/pppoe-init-suse $(DESTDIR)/etc/rc.d/init.d/pppoe ; \
 	fi
 
-	@if [ -f l2tp/handlers/sync-pppd.so ] ; then \
-		mkdir -p $(DESTDIR)/usr/lib/l2tp/plugins ; \
-		$(install) -m 755 l2tp/handlers/sync-pppd.so $(DESTDIR)/usr/lib/l2tp/plugins ; \
-		mkdir -p $(DESTDIR)/etc/l2tp ; \
-		$(install) -m 600 l2tp/l2tp.conf $(DESTDIR)/etc/l2tp/l2tp.conf.example ; \
-	fi
 	@echo ""
 	@echo "Type 'pppoe-setup' to configure the software."
 
@@ -294,7 +288,6 @@ servpoet-rpms: servpoet-tgz
 clean:
 	rm -f *.o pppoe-relay pppoe pppoe-sniff pppoe-server core rp-pppoe.so plugin/*.o plugin/libplugin.a *~
 	test -f libevent/Makefile && $(MAKE) -C libevent clean || true
-	test -f l2tp/Makefile && $(MAKE) -C l2tp clean || true
 
 distclean: clean
 	rm -f Makefile config.h config.cache config.log config.status
@@ -311,9 +304,6 @@ update-version:
 km:
 	./configure --enable-plugin=/home/dfs/Archive/PPP/ppp-2.4.0.pppoe4-patched-dfs
 
-l2tp: libevent/libevent.a
-	$(MAKE) -C l2tp all
-
 .PHONY: update-version
 
 .PHONY: clean
@@ -324,4 +314,3 @@ l2tp: libevent/libevent.a
 
 .PHONY: distro
 
-.PHONY: l2tp
