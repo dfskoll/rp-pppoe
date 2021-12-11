@@ -25,6 +25,9 @@
 #include <net/if.h>
 #endif
 
+/* Patched hack to make this cross compile */
+#define HAVE_LINUX_KERNEL_PPPOE 1
+
 #if defined(HAVE_NETPACKET_PACKET_H) || defined(HAVE_LINUX_IF_PACKET_H)
 #define _POSIX_SOURCE 1 /* For sigaction defines */
 #endif

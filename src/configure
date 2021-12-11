@@ -4542,7 +4542,7 @@ modprobe ppp_synctty > /dev/null 2>&1
 modprobe pppoe > /dev/null 2>&1
 fi
 if test "$cross_compiling" = yes; then :
-  ac_cv_linux_kernel_pppoe=no; echo "cross-compiling, default: "
+  ac_cv_linux_kernel_pppoe=yes; echo "cross-compiling, default: "
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
