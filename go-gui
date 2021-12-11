@@ -23,7 +23,7 @@ MYDIR=`dirname $0`
 cd $MYDIR/src
 
 echo "Running ./configure..."
-./configure
+./configure --enable-plugin
 if [ "$?" != 0 ] ; then
     echo "Oops!  It looks like ./configure failed."
     exit 1
