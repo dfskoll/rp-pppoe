@@ -22,6 +22,6 @@ as well.
 
 7. Read `doc/HOW-TO-CONNECT`
 
-Dianne Skoll <dianne@skoll.ca>
+# Project Home Page
 
 [Project Home Page](https://dianne.skoll.ca/projects/rp-pppoe/)
