@@ -58,16 +58,23 @@ if [ ! -r "$PPPD_PIDFILE" ] ; then
     exit 1
 fi
 
-PPPD_PID=`cat "$PPPD_PIDFILE"`
+PPPD_PID=`head -n 1 "$PPPD_PIDFILE"`
+IF=`tail -n +2 $PPPD_PIDFILE | head -n 1`
+if test "$IF" = "" ; then
+    IF=ppp0
+fi
 
 # Sigh.  Some versions of pppd put PID files in /var/run; others put them
 # in /etc/ppp.  Since it's too messy to figure out what pppd does, we
 # try both locations.
 for i in /etc/ppp/ppp*.pid /var/run/ppp*.pid ; do
     if [ -r $i ] ; then
-	PID=`cat $i`
+	PID=`head -n 1 $i`
+        IF=`tail -n +2 $i | head -n 1`
+        if test "IF" = "" ; then
+            IF=`basename $i .pid`
+        fi
 	if [ "$PID" = "$PPPD_PID" ] ; then
-	    IF=`basename $i .pid`
 	    $IP route | grep "dev ${IF}" > /dev/null
 	    if [ "$?" != "0" ] ; then
 		echo "pppoe-status: Link is attached to $IF, but $IF is down"
