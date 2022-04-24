@@ -71,7 +71,7 @@ for i in /etc/ppp/ppp*.pid /var/run/ppp*.pid ; do
     if [ -r $i ] ; then
 	PID=`head -n 1 $i`
         IF=`tail -n +2 $i | head -n 1`
-        if test "IF" = "" ; then
+        if test "$IF" = "" ; then
             IF=`basename $i .pid`
         fi
 	if [ "$PID" = "$PPPD_PID" ] ; then
