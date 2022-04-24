@@ -61,6 +61,10 @@ fi
 PPPD_PID=`head -n 1 "$PPPD_PIDFILE"`
 IF=`tail -n +2 $PPPD_PIDFILE | head -n 1`
 if test "$IF" = "" ; then
+    # There's no way to get the actual interface name
+    # if it's not in the PID file, so we punt and
+    # assume ppp0.  This may break in some cases
+    # if you don't use the "ifname" option to pppd.
     IF=ppp0
 fi
 
