@@ -304,6 +304,25 @@ incrementIPAddress(unsigned char ip[IPV4ALEN])
 }
 
 /**********************************************************************
+*%FUNCTION: ipIsNull (static)
+*%ARGUMENTS:
+* addr -- a 4-byte array representing IP address
+*%RETURNS:
+* 1 if ip represents 0.0.0.0, used to indicate delegation, 0 otherwise.
+*%DESCRIPTION:
+* Checks if ip is the null address used to indicate that IP allocation is
+* to be delegated to pppd.
+***********************************************************************/
+static int
+ipIsNull(const unsigned char ip[IPV4ALEN])
+{
+    for (int i = 0; i < IPV4ALEN; ++i)
+	if (ip[i])
+	    return 0;
+    return 1;
+}
+
+/**********************************************************************
 *%FUNCTION: killAllSessions
 *%ARGUMENTS:
 * None
@@ -1556,7 +1575,7 @@ main(int argc, char **argv)
 	Sessions[i].funcs = &DefaultSessionFunctionTable;
 	Sessions[i].sess = htons(i+1+SessOffset);
 
-	if (!addressPoolFname) {
+	if (!addressPoolFname && !ipIsNull(RemoteIP)) {
 	    memcpy(Sessions[i].peerip, RemoteIP, sizeof(RemoteIP));
 #ifdef HAVE_LICENSE
 	    memcpy(Sessions[i].realpeerip, RemoteIP, sizeof(RemoteIP));
@@ -1933,6 +1952,26 @@ sendErrorPADS(int sock,
     sendPacket(NULL, sock, &pads, (int) (plen + HDR_SIZE));
 }
 
+/**********************************************************************
+*%FUNCTION: makePPPDIpArg
+*%ARGUMENTS:
+* buffer -- target buffer output, should be large enough (32 bytes worst case).
+* localip -- the local IP address (myip), 0.0.0.0 for delegation.
+* remoteip -- the local IP address (myip), 0.0.0.0 for delegation.
+*%DESCRIPTION:
+* prints the localip:remoteip argument for pppd, taking delegation
+* into account, returning 0 if, and only if, both IP addresses are delegated,
+* and 1 otherwise.
+***********************************************************************/
+static void
+makePPPDIpArg(char* buffer, const unsigned char localip[IPV4ALEN], const unsigned char remoteip[IPV4ALEN])
+{
+    if (!ipIsNull(localip))
+	buffer += sprintf(buffer, "%u.%u.%u.%u", localip[0], localip[1], localip[2], localip[3]);
+    strcpy(buffer++, ":");
+    if (!ipIsNull(remoteip))
+	buffer += sprintf(buffer, "%u.%u.%u.%u", remoteip[0], remoteip[1], remoteip[2], remoteip[3]);
+}
 
 /**********************************************************************
 *%FUNCTION: startPPPDUserMode
@@ -1953,6 +1992,16 @@ startPPPDUserMode(ClientSession *session)
 
     int c = 0;
 
+    syslog(LOG_INFO,
+	   "Session %u created for client %02x:%02x:%02x:%02x:%02x:%02x (%d.%d.%d.%d) on %s using Service-Name '%s'",
+	   (unsigned int) ntohs(session->sess),
+	   session->eth[0], session->eth[1], session->eth[2],
+	   session->eth[3], session->eth[4], session->eth[5],
+	   (int) session->peerip[0], (int) session->peerip[1],
+	   (int) session->peerip[2], (int) session->peerip[3],
+	   session->ethif->name,
+	   session->serviceName);
+
     argv[c++] = "pppd";
     argv[c++] = "pty";
 
@@ -1972,20 +2021,7 @@ startPPPDUserMode(ClientSession *session)
     argv[c++] = "file";
     argv[c++] = pppoptfile;
 
-    snprintf(buffer, sizeof(buffer), "%d.%d.%d.%d:%d.%d.%d.%d",
-	    (int) session->myip[0], (int) session->myip[1],
-	    (int) session->myip[2], (int) session->myip[3],
-	    (int) session->peerip[0], (int) session->peerip[1],
-	    (int) session->peerip[2], (int) session->peerip[3]);
-    syslog(LOG_INFO,
-	   "Session %u created for client %02x:%02x:%02x:%02x:%02x:%02x (%d.%d.%d.%d) on %s using Service-Name '%s'",
-	   (unsigned int) ntohs(session->sess),
-	   session->eth[0], session->eth[1], session->eth[2],
-	   session->eth[3], session->eth[4], session->eth[5],
-	   (int) session->peerip[0], (int) session->peerip[1],
-	   (int) session->peerip[2], (int) session->peerip[3],
-	   session->ethif->name,
-	   session->serviceName);
+    makePPPDIpArg(buffer, session->myip, session->peerip);
     argv[c++] = strdup(buffer);
     if (!argv[c-1]) {
 	/* TODO: Send a PADT */
@@ -2041,6 +2077,16 @@ startPPPDLinuxKernelMode(ClientSession *session)
 
     char buffer[SMALLBUF];
 
+    syslog(LOG_INFO,
+	   "Session %u created for client %02x:%02x:%02x:%02x:%02x:%02x (%d.%d.%d.%d) on %s using Service-Name '%s'",
+	   (unsigned int) ntohs(session->sess),
+	   session->eth[0], session->eth[1], session->eth[2],
+	   session->eth[3], session->eth[4], session->eth[5],
+	   (int) session->peerip[0], (int) session->peerip[1],
+	   (int) session->peerip[2], (int) session->peerip[3],
+	   session->ethif->name,
+	   session->serviceName);
+
     argv[c++] = "pppd";
     argv[c++] = "plugin";
     argv[c++] = PLUGIN_PATH;
@@ -2067,20 +2113,7 @@ startPPPDLinuxKernelMode(ClientSession *session)
     argv[c++] = "file";
     argv[c++] = pppoptfile;
 
-    snprintf(buffer, SMALLBUF, "%d.%d.%d.%d:%d.%d.%d.%d",
-	    (int) session->myip[0], (int) session->myip[1],
-	    (int) session->myip[2], (int) session->myip[3],
-	    (int) session->peerip[0], (int) session->peerip[1],
-	    (int) session->peerip[2], (int) session->peerip[3]);
-    syslog(LOG_INFO,
-	   "Session %u created for client %02x:%02x:%02x:%02x:%02x:%02x (%d.%d.%d.%d) on %s using Service-Name '%s'",
-	   (unsigned int) ntohs(session->sess),
-	   session->eth[0], session->eth[1], session->eth[2],
-	   session->eth[3], session->eth[4], session->eth[5],
-	   (int) session->peerip[0], (int) session->peerip[1],
-	   (int) session->peerip[2], (int) session->peerip[3],
-	   session->ethif->name,
-	   session->serviceName);
+    makePPPDIpArg(buffer, session->myip, session->peerip);
     argv[c++] = strdup(buffer);
     if (!argv[c-1]) {
 	/* TODO: Send a PADT */

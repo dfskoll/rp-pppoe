@@ -84,8 +84,9 @@ details.  In addition, it causes \fBpppd\fR to be invoked with the
 
 .TP
 .B \-L \fIip\fR
-Sets the local IP address.  This is passed to spawned \fBpppd\fR processes.
-If not specified, the default is 10.0.0.1.
+Sets the local IP address.  This is passed to spawned \fBpppd\fR processes.  If
+not specified, the default is 10.0.0.1.  If specified as 0.0.0.0 the selection
+of local IP address is delegated to \fBpppd\fR.
 
 .TP
 .B \-R \fIip\fR
@@ -93,7 +94,8 @@ Sets the starting remote IP address.  As sessions are established,
 IP addresses are assigned starting from \fIip\fR.   \fBpppoe-server\fR
 automatically keeps track of the pool of addresses and passes a
 valid remote IP address to \fBpppd\fR.  If not specified, a starting address
-of 10.67.15.1 is used.
+of 10.67.15.1 is used.  If specified as 0.0.0.0 remote IP allocation will be
+delegated to \fBpppd\fR.
 
 .TP
 .B \-N \fInum\fR
