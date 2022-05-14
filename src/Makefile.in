@@ -162,8 +162,7 @@ install: all
 	$(install) -m 644 ../doc/KERNEL-MODE-PPPOE $(DESTDIR)$(docdir)
 	$(install) -m 644 ../doc/HOW-TO-CONNECT $(DESTDIR)$(docdir)
 	$(install) -m 644 ../doc/LICENSE $(DESTDIR)$(docdir)
-	$(install) -m 644 ../README $(DESTDIR)$(docdir)
-	$(install) -m 644 ../SERVPOET $(DESTDIR)$(docdir)
+	$(install) -m 644 ../README.md $(DESTDIR)$(docdir)
 	$(install) -m 644 ../configs/pap-secrets $(DESTDIR)$(docdir)
 	-mkdir -p $(DESTDIR)$(mandir)/man8
 	for i in $(TARGETS) ; do \
