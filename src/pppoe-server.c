@@ -101,6 +101,7 @@ static int PppoeSessionIsActive(ClientSession *ses);
 #define MAX_SERVICE_NAMES 64
 static int NumServiceNames = 0;
 static char const *ServiceNames[MAX_SERVICE_NAMES];
+static char *drainfile;
 
 PppoeSessionFunctionTable DefaultSessionFunctionTable = {
     PppoeStopSession,
@@ -659,6 +660,12 @@ processPADI(Interface *ethif, PPPoEPacket *packet, int len)
 	return;
     }
 
+    /* If drainfile is set, and the file exist */
+    if (drainfile && access(drainfile, F_OK) == 0) {
+	syslog(LOG_INFO, "PADI ignored, instance draining");
+	return;
+    }
+
     /* If number of sessions per MAC is limited, check here and don't
        send PADO if already max number of sessions. */
     if (MaxSessionsPerMac) {
@@ -1184,6 +1191,7 @@ usage(char const *argv0)
     fprintf(stderr, "   -f disc:sess   -- Set Ethernet frame types (hex).\n");
     fprintf(stderr, "   -s             -- Use synchronous PPP mode.\n");
     fprintf(stderr, "   -X pidfile     -- Write PID and lock pidfile.\n");
+    fprintf(stderr, "   -D drainfile   -- If during runtime the file exist stop responding to PADI.\n");
     fprintf(stderr, "   -q /path/pppd  -- Specify full path to pppd.\n");
     fprintf(stderr, "   -Q /path/pppoe -- Specify full path to pppoe.\n");
 #ifdef HAVE_LINUX_KERNEL_PPPOE
@@ -1355,6 +1363,9 @@ main(int argc, char **argv)
 	case 'd':
 	    Debug = 1;
 	    break;
+	case 'D':
+		SET_STRING(drainfile, optarg);
+		break;
 	case 'P':
 	    CheckPoolSyntax = 1;
 	    break;
