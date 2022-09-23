@@ -31,6 +31,7 @@
 
 #include "pppoe-server.h"
 #include "md5.h"
+#include "control_socket.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
@@ -61,6 +62,8 @@
 #include <time.h>
 
 #include <signal.h>
+
+#include <stdarg.h>
 
 #ifdef HAVE_LICENSE
 #include "license.h"
@@ -210,6 +213,35 @@ count_sessions_from_mac(unsigned char *eth)
     }
     return n;
 }
+
+/**********************************************************************
+*Structures describing the CLI interface, and forward declarations.
+***********************************************************************/
+ControlCommand cmd_set[] = {
+    { .command = NULL, }
+};
+
+static int handle_status(ClientConnection *client, const char* const* argv, int argi, void* pvt, void* clientpvt);
+
+ControlCommand cmd_status[] = {
+    { .command = "status", .handler = handle_status, },
+    { .command = NULL, }
+};
+
+
+ControlCommand cmd_root[] = {
+    {
+	.command = "set",
+	.handler = control_socket_handle_command,
+	.pvt = &cmd_set,
+    },
+    {
+	.command = "show",
+	.handler = control_socket_handle_command,
+	.pvt = &cmd_status,
+    },
+    { .command = NULL, }
+};
 
 /**********************************************************************
 *%FUNCTION: childHandler
@@ -1233,6 +1265,7 @@ main(int argc, char **argv)
     unsigned int discoveryType, sessionType;
     char *addressPoolFname = NULL;
     char *pidfile = NULL;
+    char *unix_control = NULL;
     char c;
 
 #ifdef HAVE_LICENSE
@@ -1240,9 +1273,9 @@ main(int argc, char **argv)
 #endif
 
 #ifndef HAVE_LINUX_KERNEL_PPPOE
-    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:sp:lrudPc:S:1q:Q:H:M:";
+    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:sp:lrudPc:S:1q:Q:H:M:U:";
 #else
-    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPc:S:1q:Q:H:M:";
+    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPc:S:1q:Q:H:M:U:";
 #endif
 
     if (getuid() != geteuid() ||
@@ -1482,6 +1515,10 @@ main(int argc, char **argv)
 		     " -%c %s", opt, optarg);
 	    break;
 
+	case 'U':
+	    SET_STRING(unix_control, optarg);
+	    break;
+
 	case 'h':
 	    usage(argv[0]);
 	    exit(EXIT_SUCCESS);
@@ -1664,6 +1701,9 @@ main(int argc, char **argv)
     if (!event_selector) {
 	rp_fatal("Could not create EventSelector -- probably out of memory");
     }
+
+    if (unix_control && control_socket_init(event_selector, unix_control, cmd_root) != 0)
+	rp_fatal("control_socket_init failed");
 
     /* Control channel */
 #ifdef HAVE_LICENSE
@@ -2435,3 +2475,39 @@ sendHURLorMOTM(PPPoEConnection *conn, char const *url, UINT16_t tag)
     }
 #endif
 }
+
+/**********************************************************************
+* %FUNCTION: handle_status
+***********************************************************************/
+#define opt_matches(o)		(wlen == 0 || strncmp(opt, o, wlen) == 0)
+#define opt_outp(o, fmt, ...)	cs_ret_printf(client, "%20s: " fmt "\n", o, ## __VA_ARGS__)
+#define opt_status(o, fmt, ...)	do { if (opt_matches(o)) { opt_outp(o, fmt, ## __VA_ARGS__); }} while(0)
+
+static int handle_status(ClientConnection *client, const char* const* argv, int argi, void* pvt, void* clientpvt)
+{
+    char opt[64]; /* WARNING: may not be null terminated!!!! */
+    size_t wlen = 0;
+    while (wlen < sizeof(opt) && argv[argi]) {
+	int r = snprintf(&opt[wlen], sizeof(opt) - wlen, "%s ", argv[argi++]);
+	if (r < 0) {
+	    syslog(LOG_WARNING, "snprintf error: %s", strerror(errno));
+	    return -1;
+	}
+	wlen += r;
+    }
+    if (wlen > sizeof(opt))
+	wlen = sizeof(opt);
+    if (opt[wlen-1] == ' ')
+	--wlen;
+
+    opt_status("interface count", "%d", NumInterfaces);
+    if (opt_matches("interface list")) {
+	for (int i = 0; i < NumInterfaces; ++i)
+	    opt_outp("interface list", "%s", interfaces[i].name);
+    }
+    cs_ret_printf(client, "-- end --\n");
+    return 0;
+}
+#undef opt_status
+#undef opt_outp
+#undef opt_matches
