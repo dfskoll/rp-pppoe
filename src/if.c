@@ -350,10 +350,8 @@ openInterface(char const *ifname, UINT16_t type, unsigned char *hwaddr)
 	fatalSys("ioctl(SIOCGIFMTU)");
     }
     if (ifr.ifr_mtu < ETH_DATA_LEN) {
-	char buffer[256];
-	sprintf(buffer, "Interface %.16s has MTU of %d -- should be %d.  You may have serious connection problems.",
+	printErr("Interface %.16s has MTU of %d -- should be %d.  You may have serious connection problems.",
 		ifname, ifr.ifr_mtu, ETH_DATA_LEN);
-	printErr(buffer);
     }
 #endif
 
@@ -486,10 +484,8 @@ openInterface(char const *ifname, UINT16_t type, unsigned char *hwaddr, UINT16_t
 	fatalSys("ioctl(SIOCGIFMTU)");
     }
     if (ifr.ifr_mtu < ETH_DATA_LEN) {
-	char buffer[256];
-	sprintf(buffer, "Interface %.16s has MTU of %d -- should be %d.  You may have serious connection problems.",
+	printErr("Interface %.16s has MTU of %d -- should be %d.  You may have serious connection problems.",
 		ifname, ifr.ifr_mtu, ETH_DATA_LEN);
-	printErr(buffer);
     }
     if (mtu) *mtu = ifr.ifr_mtu;
 

@@ -491,8 +491,7 @@ fatalSys(char const *str)
 {
     char buf[1024];
     int i = errno;
-    sprintf(buf, "%.256s: %.256s", str, strerror(i));
-    printErr(buf);
+    printErr("%.256s: %.256s", str, strerror(i));
     sprintf(buf, "RP-PPPoE: %.256s: %.256s", str, strerror(i));
     sendPADT(conn, buf);
     exit(1);
@@ -510,7 +509,7 @@ fatalSys(char const *str)
 void
 rp_fatal(char const *str)
 {
-    printErr(str);
+    printErr("%s", str);
     sendPADTf(conn, "RP-PPPoE: %.256s", str);
     exit(1);
 }

@@ -693,10 +693,8 @@ main(int argc, char *argv[])
 void
 fatalSys(char const *str)
 {
-    char buf[1024];
-    sprintf(buf, "%.256s: Session %d: %.256s",
+    printErr("%.256s: Session %d: %.256s",
 	    str, (int) ntohs(Connection->session), strerror(errno));
-    printErr(buf);
     sendPADTf(Connection, "RP-PPPoE: System call error: %s",
 	      strerror(errno));
     exit(EXIT_FAILURE);
@@ -714,9 +712,7 @@ fatalSys(char const *str)
 void
 sysErr(char const *str)
 {
-    char buf[1024];
-    sprintf(buf, "%.256s: %.256s", str, strerror(errno));
-    printErr(buf);
+    printErr("%.256s: %.256s", str, strerror(errno));
 }
 
 /**********************************************************************
@@ -731,7 +727,7 @@ sysErr(char const *str)
 void
 rp_fatal(char const *str)
 {
-    printErr(str);
+    printErr("%s", str);
     sendPADTf(Connection, "RP-PPPoE: Session %d: %.256s",
 	      (int) ntohs(Connection->session), str);
     exit(EXIT_FAILURE);

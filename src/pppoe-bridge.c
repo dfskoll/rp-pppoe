@@ -2186,9 +2186,7 @@ sendHURLorMOTM(PPPoEConnection *conn, char const *url, UINT16_t tag)
 void
 fatalSys(char const *str)
 {
-    char buf[SMALLBUF];
-    snprintf(buf, SMALLBUF, "%s: %s", str, strerror(errno));
-    printErr(buf);
+    printErr("%s: %s", str, strerror(errno));
     control_exit();
     exit(EXIT_FAILURE);
 }
@@ -2205,9 +2203,7 @@ fatalSys(char const *str)
 void
 sysErr(char const *str)
 {
-    char buf[1024];
-    sprintf(buf, "%.256s: %.256s", str, strerror(errno));
-    printErr(buf);
+    printErr("%.256s: %.256s", str, strerror(errno));
 }
 
 /**********************************************************************
@@ -2222,7 +2218,7 @@ sysErr(char const *str)
 void
 rp_fatal(char const *str)
 {
-    printErr(str);
+    printErr("%s", str);
     control_exit();
     exit(EXIT_FAILURE);
 }
