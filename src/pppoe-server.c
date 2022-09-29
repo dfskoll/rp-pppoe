@@ -2500,10 +2500,20 @@ static int handle_status(ClientConnection *client, const char* const* argv, int 
     if (opt[wlen-1] == ' ')
 	--wlen;
 
+    opt_status("active sessions", "%lu", NumActiveSessions);
+    opt_status("maximum sessions", "%lu", NumSessionSlots);
+    opt_status("sessions per mac", "%d", MaxSessionsPerMac);
     opt_status("interface count", "%d", NumInterfaces);
     if (opt_matches("interface list")) {
-	for (int i = 0; i < NumInterfaces; ++i)
-	    opt_outp("interface list", "%s", interfaces[i].name);
+	for (int i = 0; i < NumInterfaces; ++i) {
+	    if (!opt_matches(interfaces[i].name))
+		continue;
+	    cs_ret_printf(client, "Interface details: %s\n", interfaces[i].name);
+	    opt_outp("local mac", "%02x:%02x:%02x:%02x:%02x:%02x",
+		    interfaces[i].mac[0], interfaces[i].mac[1], interfaces[i].mac[2],
+		    interfaces[i].mac[3], interfaces[i].mac[4], interfaces[i].mac[5]);
+	    opt_outp("mtu", "%u", interfaces[i].mtu);
+	}
     }
     cs_ret_printf(client, "-- end --\n");
     return 0;
