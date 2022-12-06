@@ -29,6 +29,11 @@ typedef struct EventTcpConnectState_t {
     void *data;
 } EventTcpConnectState;
 
+typedef struct EventTcpAcceptData_t {
+	EventTcpAcceptFunc fn;
+	void *data;
+} EventTcpAcceptData_t;
+
 /**********************************************************************
 * %FUNCTION: handle_accept
 * %ARGUMENTS:
@@ -49,14 +54,13 @@ handle_accept(EventSelector *es,
 	      void *data)
 {
     int conn;
-    EventTcpAcceptFunc f;
+    EventTcpAcceptData_t *d = (EventTcpAcceptData_t*) data;
 
     EVENT_DEBUG(("tcp_handle_accept(es=%p, fd=%d, flags=%u, data=%p)\n", es, fd, flags, data));
     conn = accept(fd, NULL, NULL);
     if (conn < 0) return;
-    f = (EventTcpAcceptFunc) data;
 
-    f(es, conn);
+    d->fn(es, conn, d->data);
 }
 
 /**********************************************************************
@@ -130,7 +134,8 @@ handle_connect(EventSelector *es,
 EventHandler *
 EventTcp_CreateAcceptor(EventSelector *es,
 			int socket,
-			EventTcpAcceptFunc f)
+			EventTcpAcceptFunc f,
+			void *data)
 {
     int flags;
 
@@ -144,9 +149,19 @@ EventTcp_CreateAcceptor(EventSelector *es,
 	return NULL;
     }
 
-    return Event_AddHandler(es, socket, EVENT_FLAG_READABLE,
-			    handle_accept, (void *) f);
+    EventTcpAcceptData_t *d = malloc(sizeof(EventTcpAcceptData_t));
+    if (!d)
+	return NULL;
+    d->fn = f;
+    d->data = data;
 
+    EventHandler *eh = Event_AddHandler(es, socket, EVENT_FLAG_READABLE,
+			    handle_accept, (void *) d);
+    if (!eh) {
+	free(d);
+    }
+
+    return eh;
 }
 
 /**********************************************************************
