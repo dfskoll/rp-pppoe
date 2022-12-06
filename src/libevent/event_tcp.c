@@ -373,7 +373,7 @@ EventTcp_ReadBuf(EventSelector *es,
     if (flags == -1) {
 	return NULL;
     }
-    if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
+    if (!(flags & O_NONBLOCK) && fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
 	return NULL;
     }
 
@@ -454,7 +454,7 @@ EventTcp_WriteBuf(EventSelector *es,
     if (flags == -1) {
 	return NULL;
     }
-    if (fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
+    if (!(flags & O_NONBLOCK) && fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1) {
 	return NULL;
     }
 
