@@ -1158,6 +1158,23 @@ processPADR(Interface *ethif, PPPoEPacket *packet, int len)
 }
 
 /**********************************************************************
+*%FUNCTION: pppoe_terminate
+*%ARGUMENTS:
+* sig -- signal number
+*%RETURNS:
+* Nothing
+*%DESCRIPTION:
+* Call this in order to terminate the server.
+***********************************************************************/
+static __attribute__((noreturn)) void
+pppoe_terminate(void)
+{
+    killAllSessions();
+    control_exit();
+    exit(0);
+}
+
+/**********************************************************************
 *%FUNCTION: termHandler
 *%ARGUMENTS:
 * sig -- signal number
@@ -1172,9 +1189,7 @@ termHandler(int sig)
     syslog(LOG_INFO,
 	   "Terminating on signal %d -- killing all PPPoE sessions",
 	   sig);
-    killAllSessions();
-    control_exit();
-    exit(0);
+    pppoe_terminate();
 }
 
 /**********************************************************************
@@ -1869,9 +1884,7 @@ main(int argc, char **argv)
 #ifdef HAVE_LICENSE
 	if (License_Expired(ServerLicense)) {
 	    syslog(LOG_INFO, "Server license has expired -- killing all PPPoE sessions");
-	    killAllSessions();
-	    control_exit();
-	    exit(0);
+	    pppoe_terminate();
 	}
 #endif
     }
