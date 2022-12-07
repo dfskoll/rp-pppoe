@@ -97,6 +97,15 @@ do {\
     } \
 } while(0)
 
+#define DRAIN_OFF	0
+#define DRAIN_ON	1
+#define DRAIN_QUIT	2
+static const char* drain_string[] = {
+    "off (actively accepting connection)",
+    "on (not accepting connections)",
+    "quit (not accepting, will terminate when drained)",
+};
+
 static void PppoeStopSession(ClientSession *ses, char const *reason);
 static int PppoeSessionIsActive(ClientSession *ses);
 
@@ -121,6 +130,7 @@ ClientSession *BusySessions = NULL;
 Interface *interfaces = NULL;
 int NumInterfaces = 0;
 int MaxInterfaces = 0;
+int draining = 0;
 
 /* The number of session slots */
 size_t NumSessionSlots;
@@ -217,7 +227,10 @@ count_sessions_from_mac(unsigned char *eth)
 /**********************************************************************
 *Structures describing the CLI interface, and forward declarations.
 ***********************************************************************/
+static int handle_set_drain(ClientConnection *client, const char* const* argv, int argi, void* pvt, void* clientpvt);
+
 ControlCommand cmd_set[] = {
+    { .command = "drain", .handler = handle_set_drain, },
     { .command = NULL, }
 };
 
@@ -674,6 +687,12 @@ processPADI(Interface *ethif, PPPoEPacket *packet, int len)
     int i;
     int ok = 0;
     unsigned char *myAddr = ethif->mac;
+
+    /* Ignore PADI's if we're draining the server */
+    if (draining != DRAIN_OFF) {
+	syslog(LOG_ERR, "PADI ignored due to server draining.");
+	return;
+    }
 
     /* Ignore PADI's which don't come from a unicast address */
     if (NOT_UNICAST(packet->ethHdr.h_source)) {
@@ -1881,6 +1900,11 @@ main(int argc, char **argv)
 	    fatalSys("Event_HandleEvent");
 	}
 
+	if (draining == DRAIN_QUIT && NumActiveSessions == 0) {
+	    syslog(LOG_INFO, "All active sessions are terminated and draining is set to quit.");
+	    pppoe_terminate();
+	}
+
 #ifdef HAVE_LICENSE
 	if (License_Expired(ServerLicense)) {
 	    syslog(LOG_INFO, "Server license has expired -- killing all PPPoE sessions");
@@ -2517,6 +2541,7 @@ static int handle_status(ClientConnection *client, const char* const* argv, int 
     opt_status("maximum sessions", "%lu", NumSessionSlots);
     opt_status("sessions per mac", "%d", MaxSessionsPerMac);
     opt_status("interface count", "%d", NumInterfaces);
+    opt_status("global drain", "%s", drain_string[draining]);
     if (opt_matches("interface list")) {
 	for (int i = 0; i < NumInterfaces; ++i) {
 	    if (!opt_matches(interfaces[i].name))
@@ -2534,3 +2559,28 @@ static int handle_status(ClientConnection *client, const char* const* argv, int 
 #undef opt_status
 #undef opt_outp
 #undef opt_matches
+
+/**********************************************************************
+* %FUNCTION: handle_set_drain
+***********************************************************************/
+static int handle_set_drain(ClientConnection *client, const char* const* argv, int argi, void* pvt, void* clientpvt)
+{
+    if (!argv[argi]) {
+	cs_ret_printf(client, "USAGE: set drain {off|on|quit}\n");
+	return 0;
+    }
+
+    if (strcmp(argv[argi], "off") == 0) {
+	draining = DRAIN_OFF;
+	cs_ret_printf(client, "Server is not draining\n");
+    } else if (strcmp(argv[argi], "on") == 0) {
+	draining = DRAIN_ON;
+	cs_ret_printf(client, "Server is now draining\n");
+    } else if (strcmp(argv[argi], "quit") == 0) {
+	draining = DRAIN_QUIT;
+	cs_ret_printf(client, "Server is now draining, and will quit when all clients are disconnected\n");
+    } else {
+	cs_ret_printf(client, "Invalid value %s for set drain, value must be one of off, on or quit.\n", argv[argi]);
+    }
+    return 0;
+}
