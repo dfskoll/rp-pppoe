@@ -2047,16 +2047,16 @@ makePPPDIpArg(char* buffer, const unsigned char localip[IPV4ALEN], const unsigne
 }
 
 /**********************************************************************
-*%FUNCTION: startPPPDUserMode
+*%FUNCTION: startPPPD
 *%ARGUMENTS:
 * session -- client session record
 *%RETURNS:
 * Nothing
 *%DESCRIPTION:
-* Starts PPPD for user-mode PPPoE
+* Starts PPPD for user- or kernel-mode PPPoE
 ***********************************************************************/
-void
-startPPPDUserMode(ClientSession *session)
+static void
+startPPPD(ClientSession *session)
 {
     /* Leave some room */
     char *argv[64];
@@ -2076,113 +2076,53 @@ startPPPDUserMode(ClientSession *session)
 	   session->serviceName);
 
     argv[c++] = "pppd";
-    argv[c++] = "pty";
 
-    /* Let's hope service-name does not have ' in it... */
-    snprintf(buffer, sizeof(buffer), "%s -n -I %s -e %u:%02x:%02x:%02x:%02x:%02x:%02x%s -S '%s'",
-	     pppoe_path, session->ethif->name,
-	     (unsigned int) ntohs(session->sess),
-	     session->eth[0], session->eth[1], session->eth[2],
-	     session->eth[3], session->eth[4], session->eth[5],
-	     PppoeOptions, session->serviceName);
-    argv[c++] = strdup(buffer);
-    if (!argv[c-1]) {
-	/* TODO: Send a PADT */
-	exit(EXIT_FAILURE);
-    }
+    if (UseLinuxKernelModePPPoE) {
+	/* kernel mode */
+	argv[c++] = "plugin";
+	argv[c++] = PLUGIN_PATH;
 
-    argv[c++] = "file";
-    argv[c++] = pppoptfile;
+	/* Add "nic-" to interface name */
+	snprintf(buffer, SMALLBUF, "nic-%s", session->ethif->name);
+	argv[c++] = strdup(buffer);
+	if (!argv[c-1]) {
+	    exit(EXIT_FAILURE);
+	}
 
-    makePPPDIpArg(buffer, session->myip, session->peerip);
-    argv[c++] = strdup(buffer);
-    if (!argv[c-1]) {
-	/* TODO: Send a PADT */
-	exit(EXIT_FAILURE);
-    }
-    argv[c++] = "nodetach";
-    argv[c++] = "noaccomp";
-    argv[c++] = "nopcomp";
-    argv[c++] = "default-asyncmap";
-    if (Synchronous) {
-	argv[c++] = "sync";
-    }
-    if (PassUnitOptionToPPPD) {
-	argv[c++] = "unit";
-	sprintf(buffer, "%u", (unsigned int) (ntohs(session->sess) - 1));
-	argv[c++] = buffer;
-    }
-    if (session->requested_mtu > 1492) {
-	sprintf(buffer, "%u", (unsigned int) session->requested_mtu);
-	argv[c++] = "mru";
-	argv[c++] = buffer;
-	argv[c++] = "mtu";
-	argv[c++] = buffer;
+	snprintf(buffer, SMALLBUF, "%u:%02x:%02x:%02x:%02x:%02x:%02x",
+		(unsigned int) ntohs(session->sess),
+		session->eth[0], session->eth[1], session->eth[2],
+		session->eth[3], session->eth[4], session->eth[5]);
+	argv[c++] = "rp_pppoe_sess";
+	argv[c++] = strdup(buffer);
+	if (!argv[c-1]) {
+	    /* TODO: Send a PADT */
+	    exit(EXIT_FAILURE);
+	}
+	argv[c++] = "rp_pppoe_service";
+	argv[c++] = (char *) session->serviceName;
     } else {
-	argv[c++] = "mru";
-	argv[c++] = "1492";
-	argv[c++] = "mtu";
-	argv[c++] = "1492";
+	/* user mode */
+	argv[c++] = "pty";
+
+	/* Let's hope service-name does not have ' in it... */
+	snprintf(buffer, sizeof(buffer), "%s -n -I %s -e %u:%02x:%02x:%02x:%02x:%02x:%02x%s -S '%s'",
+		pppoe_path, session->ethif->name,
+		(unsigned int) ntohs(session->sess),
+		session->eth[0], session->eth[1], session->eth[2],
+		session->eth[3], session->eth[4], session->eth[5],
+		PppoeOptions, session->serviceName);
+	argv[c++] = strdup(buffer);
+	if (!argv[c-1]) {
+	    /* TODO: Send a PADT */
+	    exit(EXIT_FAILURE);
+	}
+
+	if (Synchronous) {
+	    argv[c++] = "sync";
+	}
     }
 
-    argv[c++] = NULL;
-
-    execv(pppd_path, argv);
-    exit(EXIT_FAILURE);
-}
-
-/**********************************************************************
-*%FUNCTION: startPPPDLinuxKernelMode
-*%ARGUMENTS:
-* session -- client session record
-*%RETURNS:
-* Nothing
-*%DESCRIPTION:
-* Starts PPPD for kernel-mode PPPoE on Linux
-***********************************************************************/
-void
-startPPPDLinuxKernelMode(ClientSession *session)
-{
-    /* Leave some room */
-    char *argv[32];
-
-    int c = 0;
-
-    char buffer[SMALLBUF];
-
-    syslog(LOG_INFO,
-	   "Session %u created for client %02x:%02x:%02x:%02x:%02x:%02x (%d.%d.%d.%d) on %s using Service-Name '%s'",
-	   (unsigned int) ntohs(session->sess),
-	   session->eth[0], session->eth[1], session->eth[2],
-	   session->eth[3], session->eth[4], session->eth[5],
-	   (int) session->peerip[0], (int) session->peerip[1],
-	   (int) session->peerip[2], (int) session->peerip[3],
-	   session->ethif->name,
-	   session->serviceName);
-
-    argv[c++] = "pppd";
-    argv[c++] = "plugin";
-    argv[c++] = PLUGIN_PATH;
-
-    /* Add "nic-" to interface name */
-    snprintf(buffer, SMALLBUF, "nic-%s", session->ethif->name);
-    argv[c++] = strdup(buffer);
-    if (!argv[c-1]) {
-	exit(EXIT_FAILURE);
-    }
-
-    snprintf(buffer, SMALLBUF, "%u:%02x:%02x:%02x:%02x:%02x:%02x",
-	     (unsigned int) ntohs(session->sess),
-	     session->eth[0], session->eth[1], session->eth[2],
-	     session->eth[3], session->eth[4], session->eth[5]);
-    argv[c++] = "rp_pppoe_sess";
-    argv[c++] = strdup(buffer);
-    if (!argv[c-1]) {
-	/* TODO: Send a PADT */
-	exit(EXIT_FAILURE);
-    }
-    argv[c++] = "rp_pppoe_service";
-    argv[c++] = (char *) session->serviceName;
     argv[c++] = "file";
     argv[c++] = pppoptfile;
 
@@ -2192,10 +2132,12 @@ startPPPDLinuxKernelMode(ClientSession *session)
 	/* TODO: Send a PADT */
 	exit(EXIT_FAILURE);
     }
+
     argv[c++] = "nodetach";
     argv[c++] = "noaccomp";
     argv[c++] = "nopcomp";
     argv[c++] = "default-asyncmap";
+
     if (PassUnitOptionToPPPD) {
 	argv[c++] = "unit";
 	sprintf(buffer, "%u", (unsigned int) (ntohs(session->sess) - 1 - SessOffset));
@@ -2216,22 +2158,6 @@ startPPPDLinuxKernelMode(ClientSession *session)
     argv[c++] = NULL;
     execv(pppd_path, argv);
     exit(EXIT_FAILURE);
-}
-
-/**********************************************************************
-*%FUNCTION: startPPPD
-*%ARGUMENTS:
-* session -- client session record
-*%RETURNS:
-* Nothing
-*%DESCRIPTION:
-* Starts PPPD
-***********************************************************************/
-void
-startPPPD(ClientSession *session)
-{
-    if (UseLinuxKernelModePPPoE) startPPPDLinuxKernelMode(session);
-    else startPPPDUserMode(session);
 }
 
 /**********************************************************************
