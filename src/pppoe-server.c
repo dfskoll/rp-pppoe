@@ -2138,6 +2138,14 @@ startPPPD(ClientSession *session)
     argv[c++] = "nopcomp";
     argv[c++] = "default-asyncmap";
 
+    argv[c++] = "remotenumber";
+    snprintf(buffer, SMALLBUF, "%02x:%02x:%02x:%02x:%02x:%02x",
+	    session->eth[0], session->eth[1], session->eth[2],
+	    session->eth[3], session->eth[4], session->eth[5]);
+    if (!(argv[c++] = strdup(buffer))) {
+	exit(EXIT_FAILURE);
+    }
+
     if (PassUnitOptionToPPPD) {
 	argv[c++] = "unit";
 	sprintf(buffer, "%u", (unsigned int) (ntohs(session->sess) - 1 - SessOffset));
