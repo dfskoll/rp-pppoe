@@ -31,6 +31,7 @@
 
 #include "pppoe-server.h"
 #include "md5.h"
+#include "control_socket.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
@@ -61,6 +62,8 @@
 #include <time.h>
 
 #include <signal.h>
+
+#include <stdarg.h>
 
 #ifdef HAVE_LICENSE
 #include "license.h"
@@ -94,6 +97,15 @@ do {\
     } \
 } while(0)
 
+#define DRAIN_OFF	0
+#define DRAIN_ON	1
+#define DRAIN_QUIT	2
+static const char* drain_string[] = {
+    "off (actively accepting connection)",
+    "on (not accepting connections)",
+    "quit (not accepting, will terminate when drained)",
+};
+
 static void PppoeStopSession(ClientSession *ses, char const *reason);
 static int PppoeSessionIsActive(ClientSession *ses);
 
@@ -118,6 +130,7 @@ ClientSession *BusySessions = NULL;
 Interface *interfaces = NULL;
 int NumInterfaces = 0;
 int MaxInterfaces = 0;
+int draining = 0;
 
 /* The number of session slots */
 size_t NumSessionSlots;
@@ -210,6 +223,38 @@ count_sessions_from_mac(unsigned char *eth)
     }
     return n;
 }
+
+/**********************************************************************
+*Structures describing the CLI interface, and forward declarations.
+***********************************************************************/
+static int handle_set_drain(ClientConnection *client, const char* const* argv, int argi, void* pvt, void* clientpvt);
+
+ControlCommand cmd_set[] = {
+    { .command = "drain", .handler = handle_set_drain, },
+    { .command = NULL, }
+};
+
+static int handle_status(ClientConnection *client, const char* const* argv, int argi, void* pvt, void* clientpvt);
+
+ControlCommand cmd_status[] = {
+    { .command = "status", .handler = handle_status, },
+    { .command = NULL, }
+};
+
+
+ControlCommand cmd_root[] = {
+    {
+	.command = "set",
+	.handler = control_socket_handle_command,
+	.pvt = &cmd_set,
+    },
+    {
+	.command = "show",
+	.handler = control_socket_handle_command,
+	.pvt = &cmd_status,
+    },
+    { .command = NULL, }
+};
 
 /**********************************************************************
 *%FUNCTION: childHandler
@@ -548,9 +593,7 @@ parsePADRTags(UINT16_t type, UINT16_t len, unsigned char *data,
 void
 fatalSys(char const *str)
 {
-    char buf[SMALLBUF];
-    snprintf(buf, SMALLBUF, "%s: %s", str, strerror(errno));
-    printErr(buf);
+    printErr("%s: %s", str, strerror(errno));
     control_exit();
     exit(EXIT_FAILURE);
 }
@@ -567,9 +610,7 @@ fatalSys(char const *str)
 void
 sysErr(char const *str)
 {
-    char buf[1024];
-    sprintf(buf, "%.256s: %.256s", str, strerror(errno));
-    printErr(buf);
+    printErr("%.256s: %.256s", str, strerror(errno));
 }
 
 /**********************************************************************
@@ -584,7 +625,7 @@ sysErr(char const *str)
 void
 rp_fatal(char const *str)
 {
-    printErr(str);
+    printErr("%s", str);
     control_exit();
     exit(EXIT_FAILURE);
 }
@@ -646,6 +687,12 @@ processPADI(Interface *ethif, PPPoEPacket *packet, int len)
     int i;
     int ok = 0;
     unsigned char *myAddr = ethif->mac;
+
+    /* Ignore PADI's if we're draining the server */
+    if (draining != DRAIN_OFF) {
+	syslog(LOG_ERR, "PADI ignored due to server draining.");
+	return;
+    }
 
     /* Ignore PADI's which don't come from a unicast address */
     if (NOT_UNICAST(packet->ethHdr.h_source)) {
@@ -1130,6 +1177,23 @@ processPADR(Interface *ethif, PPPoEPacket *packet, int len)
 }
 
 /**********************************************************************
+*%FUNCTION: pppoe_terminate
+*%ARGUMENTS:
+* sig -- signal number
+*%RETURNS:
+* Nothing
+*%DESCRIPTION:
+* Call this in order to terminate the server.
+***********************************************************************/
+static __attribute__((noreturn)) void
+pppoe_terminate(void)
+{
+    killAllSessions();
+    control_exit();
+    exit(0);
+}
+
+/**********************************************************************
 *%FUNCTION: termHandler
 *%ARGUMENTS:
 * sig -- signal number
@@ -1144,9 +1208,7 @@ termHandler(int sig)
     syslog(LOG_INFO,
 	   "Terminating on signal %d -- killing all PPPoE sessions",
 	   sig);
-    killAllSessions();
-    control_exit();
-    exit(0);
+    pppoe_terminate();
 }
 
 /**********************************************************************
@@ -1237,6 +1299,7 @@ main(int argc, char **argv)
     unsigned int discoveryType, sessionType;
     char *addressPoolFname = NULL;
     char *pidfile = NULL;
+    char *unix_control = NULL;
     char c;
 
 #ifdef HAVE_LICENSE
@@ -1244,9 +1307,9 @@ main(int argc, char **argv)
 #endif
 
 #ifndef HAVE_LINUX_KERNEL_PPPOE
-    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:sp:lrudPc:S:1q:Q:H:M:";
+    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:sp:lrudPc:S:1q:Q:H:M:U:";
 #else
-    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPc:S:1q:Q:H:M:";
+    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPc:S:1q:Q:H:M:U:";
 #endif
 
     if (getuid() != geteuid() ||
@@ -1486,6 +1549,10 @@ main(int argc, char **argv)
 		     " -%c %s", opt, optarg);
 	    break;
 
+	case 'U':
+	    SET_STRING(unix_control, optarg);
+	    break;
+
 	case 'h':
 	    usage(argv[0]);
 	    exit(EXIT_SUCCESS);
@@ -1669,6 +1736,9 @@ main(int argc, char **argv)
 	rp_fatal("Could not create EventSelector -- probably out of memory");
     }
 
+    if (unix_control && control_socket_init(event_selector, unix_control, cmd_root) != 0)
+	rp_fatal("control_socket_init failed");
+
     /* Control channel */
 #ifdef HAVE_LICENSE
     if (control_init(argc, argv, event_selector)) {
@@ -1830,12 +1900,15 @@ main(int argc, char **argv)
 	    fatalSys("Event_HandleEvent");
 	}
 
+	if (draining == DRAIN_QUIT && NumActiveSessions == 0) {
+	    syslog(LOG_INFO, "All active sessions are terminated and draining is set to quit.");
+	    pppoe_terminate();
+	}
+
 #ifdef HAVE_LICENSE
 	if (License_Expired(ServerLicense)) {
 	    syslog(LOG_INFO, "Server license has expired -- killing all PPPoE sessions");
-	    killAllSessions();
-	    control_exit();
-	    exit(0);
+	    pppoe_terminate();
 	}
 #endif
     }
@@ -2438,4 +2511,76 @@ sendHURLorMOTM(PPPoEConnection *conn, char const *url, UINT16_t tag)
 	fflush(conn->debugFile);
     }
 #endif
+}
+
+/**********************************************************************
+* %FUNCTION: handle_status
+***********************************************************************/
+#define opt_matches(o)		(wlen == 0 || strncmp(opt, o, wlen) == 0)
+#define opt_outp(o, fmt, ...)	cs_ret_printf(client, "%20s: " fmt "\n", o, ## __VA_ARGS__)
+#define opt_status(o, fmt, ...)	do { if (opt_matches(o)) { opt_outp(o, fmt, ## __VA_ARGS__); }} while(0)
+
+static int handle_status(ClientConnection *client, const char* const* argv, int argi, void* pvt, void* clientpvt)
+{
+    char opt[64]; /* WARNING: may not be null terminated!!!! */
+    size_t wlen = 0;
+    while (wlen < sizeof(opt) && argv[argi]) {
+	int r = snprintf(&opt[wlen], sizeof(opt) - wlen, "%s ", argv[argi++]);
+	if (r < 0) {
+	    syslog(LOG_WARNING, "snprintf error: %s", strerror(errno));
+	    return -1;
+	}
+	wlen += r;
+    }
+    if (wlen > sizeof(opt))
+	wlen = sizeof(opt);
+    if (opt[wlen-1] == ' ')
+	--wlen;
+
+    opt_status("active sessions", "%lu", NumActiveSessions);
+    opt_status("maximum sessions", "%lu", NumSessionSlots);
+    opt_status("sessions per mac", "%d", MaxSessionsPerMac);
+    opt_status("interface count", "%d", NumInterfaces);
+    opt_status("global drain", "%s", drain_string[draining]);
+    if (opt_matches("interface list")) {
+	for (int i = 0; i < NumInterfaces; ++i) {
+	    if (!opt_matches(interfaces[i].name))
+		continue;
+	    cs_ret_printf(client, "Interface details: %s\n", interfaces[i].name);
+	    opt_outp("local mac", "%02x:%02x:%02x:%02x:%02x:%02x",
+		    interfaces[i].mac[0], interfaces[i].mac[1], interfaces[i].mac[2],
+		    interfaces[i].mac[3], interfaces[i].mac[4], interfaces[i].mac[5]);
+	    opt_outp("mtu", "%u", interfaces[i].mtu);
+	}
+    }
+    cs_ret_printf(client, "-- end --\n");
+    return 0;
+}
+#undef opt_status
+#undef opt_outp
+#undef opt_matches
+
+/**********************************************************************
+* %FUNCTION: handle_set_drain
+***********************************************************************/
+static int handle_set_drain(ClientConnection *client, const char* const* argv, int argi, void* pvt, void* clientpvt)
+{
+    if (!argv[argi]) {
+	cs_ret_printf(client, "USAGE: set drain {off|on|quit}\n");
+	return 0;
+    }
+
+    if (strcmp(argv[argi], "off") == 0) {
+	draining = DRAIN_OFF;
+	cs_ret_printf(client, "Server is not draining\n");
+    } else if (strcmp(argv[argi], "on") == 0) {
+	draining = DRAIN_ON;
+	cs_ret_printf(client, "Server is now draining\n");
+    } else if (strcmp(argv[argi], "quit") == 0) {
+	draining = DRAIN_QUIT;
+	cs_ret_printf(client, "Server is now draining, and will quit when all clients are disconnected\n");
+    } else {
+	cs_ret_printf(client, "Invalid value %s for set drain, value must be one of off, on or quit.\n", argv[argi]);
+    }
+    return 0;
 }

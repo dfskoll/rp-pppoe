@@ -15,6 +15,7 @@ src/config.status
 src/debug.o
 src/discovery.o
 src/if.o
+src/control_socket.o
 src/libevent/Doc/libevent.aux
 src/libevent/Doc/libevent.log
 src/libevent/Doc/libevent.out

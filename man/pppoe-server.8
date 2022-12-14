@@ -189,6 +189,12 @@ if there are no free session slots.
 .B \-h
 The \fB\-h\fR option prints a brief usage message and exits.
 
+.TP
+.B \-U path
+The \fB-U\fR option creates a UNIX socket which can be connected to in order to
+manage pppoe-server at run-time.  Please refer to the \fBCONTROL-SOCKET\fR
+section below for more detailed instructions.
+
 .SH OPERATION
 
 \fBpppoe-server\fR listens for incoming PPPoE discovery packets.  When
@@ -209,6 +215,37 @@ empty!)
 
 Note that \fBpppoe-server\fR is meant mainly for testing PPPoE clients.
 It is \fInot\fR a high-performance server meant for production use.
+
+.SH CONTROL-SOCKET
+
+The control-socket was implemented as a secondary mechanism to improve run-time
+control of the pppoe-server.  To use it you need to start pppoe-server with the
+\fB-U\fR option described above.  You can then (in the absense of a
+control-client currently) use netcat to connect to the control socket, for example:
+
+.nf
+nc -U /run/pppoe-server.control
+.fi
+
+Assuming \fB-U /run/pppoe-server.control\fR was passed to pppoe-server.
+
+The following commands are implemented:
+
+.TP
+.B set drain {off|on|quit}
+This will set whether or not pppoe-server responds to PADI packets or not.
+When set to off pppoe-server will respond, else PADI packets will be ignored.
+This allows the pppoe-server to be drained from clients.  In addition when set
+to quit will terminate pppoe-server when all pppoe-clients have terminated.
+
+This allows for (mostly) seamless upgrades in that the currently running
+instance can be issued with "set drain quit" prior to starting a new interface
+on the same interfaces, thus allowing new connections to be made whilst
+maintaining proper state on existing clients.
+
+.TP
+.B show status
+This will show basic status information for the connected-to pppoe-server.
 
 .SH AUTHORS
 \fBpppoe-server\fR was written by Dianne Skoll <dianne@skoll.ca>.

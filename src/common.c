@@ -242,10 +242,22 @@ dropPrivs(void)
 * Prints a message to stderr and syslog.
 ***********************************************************************/
 void
-printErr(char const *str)
+printErr(char const *fmt, ...)
 {
+    char *str;
+    va_list ap;
+    int r;
+
+    va_start(ap, fmt);
+    r = vasprintf(&str, fmt, ap);
+    va_end(ap);
+
+    if (r < 0)
+	return;
+
     fprintf(stderr, "pppoe: %s\n", str);
     syslog(LOG_ERR, "%s", str);
+    free(str);
 }
 
 /**********************************************************************

@@ -63,7 +63,7 @@ all: $(TARGETS)
 pppoe-sniff: pppoe-sniff.o if.o common.o debug.o
 	@CC@ -o $@ $^ $(LDFLAGS)
 
-pppoe-server: pppoe-server.o if.o debug.o common.o md5.o libevent/libevent.a @PPPOE_SERVER_DEPS@
+pppoe-server: pppoe-server.o if.o debug.o common.o md5.o control_socket.o libevent/libevent.a @PPPOE_SERVER_DEPS@
 	@CC@ -o $@ @RDYNAMIC@ $^ $(LDFLAGS) $(PPPOE_SERVER_LIBS) -Llibevent -levent
 
 # Experimental code from Savoir Faire Linux.  I do not consider it

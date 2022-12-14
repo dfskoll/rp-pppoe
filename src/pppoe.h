@@ -313,7 +313,7 @@ int sendPacket(PPPoEConnection *conn, int sock, PPPoEPacket *pkt, int size);
 int receivePacket(int sock, PPPoEPacket *pkt, int *size);
 void fatalSys(char const *str);
 void rp_fatal(char const *str);
-void printErr(char const *str);
+__attribute__((format (printf, 1, 2))) void printErr(char const *fmt, ...);
 void sysErr(char const *str);
 #ifdef DEBUGGING_ENABLED
 void dumpPacket(FILE *fp, PPPoEPacket *packet, char const *dir);
