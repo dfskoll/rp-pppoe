@@ -1,22 +1,23 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl LIC: GPL
-AC_INIT(pppoe.c)
+AC_INIT
+AC_CONFIG_SRCDIR([pppoe.c])
 
 dnl pppd directory for kernel-mode PPPoE
 PPPD_DIR=ppp-2.4.1.pppoe2
 
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 AC_PREFIX_DEFAULT(/usr)
 
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_RANLIB
+AC_CHECK_TOOL([AR],[ar],[/bin/false])
 
 dnl Checks for libraries.
 
 dnl Checks for header files.
-AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h sys/dlpi.h sys/ioctl.h sys/time.h syslog.h unistd.h net/if_arp.h netinet/if_ether.h getopt.h sys/uio.h sys/param.h fcntl.h net/bpf.h netpacket/packet.h net/ethernet.h asm/types.h linux/if_packet.h linux/if_ether.h sys/socket.h net/if.h net/if_dl.h net/if_ether.h net/if_types.h netinet/if_ether.h net/if_types.h net/if_dl.h)
 AC_CHECK_HEADERS(linux/if.h, [], [], [#include<sys/socket.h>])
@@ -31,17 +32,15 @@ AC_CHECK_HEADERS(linux/if_pppox.h, [], [],
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_PID_T
-AC_HEADER_TIME
+
 AC_STRUCT_TM
 
 dnl Check for sockaddr_ll
 AC_MSG_CHECKING(for struct sockaddr_ll)
-AC_TRY_COMPILE([#include <asm/types.h>
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <asm/types.h>
 #include <linux/if_packet.h>
 #include <linux/if_ether.h>
-], [struct sockaddr_ll sa;],
-ac_cv_struct_sockaddr_ll=yes,
-ac_cv_struct_sockaddr_ll=no)
+]], [[struct sockaddr_ll sa;]])],[ac_cv_struct_sockaddr_ll=yes],[ac_cv_struct_sockaddr_ll=no])
 AC_MSG_RESULT($ac_cv_struct_sockaddr_ll)
 
 if test "$ac_cv_struct_sockaddr_ll" = yes ; then
@@ -50,12 +49,9 @@ fi
 
 dnl Check for N_HDLC line discipline
 AC_MSG_CHECKING(for N_HDLC line discipline)
-AC_TRY_COMPILE([
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <pty.h>
-],
-	[int x = N_HDLC;],
-	ac_cv_n_hdlc=yes,
-	ac_cv_n_hdlc=no)
+]], [[int x = N_HDLC;]])],[ac_cv_n_hdlc=yes],[ac_cv_n_hdlc=no])
 AC_MSG_RESULT($ac_cv_n_hdlc)
 if test "$ac_cv_n_hdlc" = yes ; then
 AC_DEFINE(HAVE_N_HDLC)
@@ -115,8 +111,7 @@ AC_SUBST(PPPOE_RELAY)
 
 dnl Checks for library functions.
 AC_FUNC_MEMCMP
-AC_FUNC_SETVBUF_REVERSED
-AC_TYPE_SIGNAL
+
 AC_CHECK_FUNCS(select socket strerror strtol strlcpy)
 AC_PROG_INSTALL
 
@@ -150,15 +145,14 @@ modprobe n_hdlc > /dev/null 2>&1
 modprobe ppp_synctty > /dev/null 2>&1
 modprobe pppoe > /dev/null 2>&1
 fi
-AC_TRY_RUN([#include <sys/socket.h>
+AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/socket.h>
 #include <netinet/in.h>
 #include <linux/if_pppox.h>
 int main()
 {
 	if (socket(AF_PPPOX, SOCK_DGRAM, PX_PROTO_OE) >= 0) return 0; else return 1;
 }
-],
-ac_cv_linux_kernel_pppoe=yes, ac_cv_linux_kernel_pppoe=no, [ac_cv_linux_kernel_pppoe=no; echo "cross-compiling, default: "])
+]])],[ac_cv_linux_kernel_pppoe=yes],[ac_cv_linux_kernel_pppoe=no],[ac_cv_linux_kernel_pppoe=no; echo "cross-compiling, default: "])
 else
 	ac_cv_linux_kernel_pppoe=no
 fi
@@ -258,7 +252,8 @@ AC_SUBST(LDFLAGS)
 datadir_evaluated=`eval echo $datadir`
 AC_SUBST(datadir_evaluated)
 
-AC_OUTPUT(Makefile libevent/Makefile ../scripts/pppoe-connect ../scripts/pppoe-start ../scripts/pppoe-stop ../scripts/pppoe-init ../scripts/pppoe-init-suse ../scripts/pppoe-setup ../gui/Makefile ../gui/tkpppoe $EXTRACONFIGS)
+AC_CONFIG_FILES([Makefile libevent/Makefile ../scripts/pppoe-connect ../scripts/pppoe-start ../scripts/pppoe-stop ../scripts/pppoe-init ../scripts/pppoe-init-suse ../scripts/pppoe-setup ../gui/Makefile ../gui/tkpppoe $EXTRACONFIGS])
+AC_OUTPUT
 
 AC_MSG_RESULT([On this platform, the following targets will be built:])
 AC_MSG_RESULT([$TARGETS])

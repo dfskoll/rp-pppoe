@@ -40,3 +40,6 @@ src/relay.o
 src/rp-pppoe.so
 src/tests/testevent
 src/tests/testevent.o
+gui/Makefile
+gui/pppoe-wrapper
+gui/wrapper.o
