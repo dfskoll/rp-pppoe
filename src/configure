@@ -5000,41 +5000,6 @@ printf "%s\n" "$as_me: WARNING: *** I will keep going, but it may not work." >&2
 	PPPD=pppd
 fi
 
-
-PPPD_VERSION=`$PPPD --version 2>&1 | awk ' /version/ {print $NF}'`
-
-case "$PPPD_VERSION" in
-1.*|2.0.*|2.1.*|2.2.*|2.3.0|2.3.1|2.3.2|2.3.3|2.3.4|2.3.5|2.3.6)
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** Oops! Your version of pppd is $PPPD_VERSION, which is too old." >&5
-printf "%s\n" "$as_me: WARNING: *** Oops! Your version of pppd is $PPPD_VERSION, which is too old." >&2;}
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** You need at least 2.3.7 (2.3.10 or newer recommended." >&5
-printf "%s\n" "$as_me: WARNING: *** You need at least 2.3.7 (2.3.10 or newer recommended." >&2;}
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** I will keep going, but it may not work." >&5
-printf "%s\n" "$as_me: WARNING: *** I will keep going, but it may not work." >&2;}
-	;;
-
-2.3.7|2.3.8|2.3.9)
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** Warning.  Your version of pppd is $PPPD_VERSION.  You will" >&5
-printf "%s\n" "$as_me: WARNING: *** Warning.  Your version of pppd is $PPPD_VERSION.  You will" >&2;}
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** not be able to use connect-on-demand.  Upgrade to pppd" >&5
-printf "%s\n" "$as_me: WARNING: *** not be able to use connect-on-demand.  Upgrade to pppd" >&2;}
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** 2.3.10 or newer if you need connect-on-demand." >&5
-printf "%s\n" "$as_me: WARNING: *** 2.3.10 or newer if you need connect-on-demand." >&2;}
-	;;
-
-2*|3*|4*|5*|6*|7*|8*|9*)
-	;;
-
-*)
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** Oops.  I cannot figure out what version of pppd you have." >&5
-printf "%s\n" "$as_me: WARNING: *** Oops.  I cannot figure out what version of pppd you have." >&2;}
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** All I got back was '$PPPD_VERSION'" >&5
-printf "%s\n" "$as_me: WARNING: *** All I got back was '$PPPD_VERSION'" >&2;}
-	{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: *** I will keep going, but it may not work." >&5
-printf "%s\n" "$as_me: WARNING: *** I will keep going, but it may not work." >&2;}
-	;;
-esac
-
 # Sigh... got to fix this up for tcl
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 # Let make expand exec_prefix.

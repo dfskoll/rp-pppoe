@@ -180,34 +180,6 @@ if test "$PPPD" = "NOTFOUND"; then
 	PPPD=pppd
 fi
 
-dnl Figure out pppd version.  2.3.7 to 2.3.9 -- issue warning.  Less than
-dnl 2.3.7 -- stop
-
-PPPD_VERSION=`$PPPD --version 2>&1 | awk ' /version/ {print $NF}'`
-
-case "$PPPD_VERSION" in
-1.*|2.0.*|2.1.*|2.2.*|2.3.0|2.3.1|2.3.2|2.3.3|2.3.4|2.3.5|2.3.6)
-	AC_MSG_WARN([*** Oops! Your version of pppd is $PPPD_VERSION, which is too old.])
-	AC_MSG_WARN([*** You need at least 2.3.7 (2.3.10 or newer recommended.])
-	AC_MSG_WARN([*** I will keep going, but it may not work.])
-	;;
-
-2.3.7|2.3.8|2.3.9)
-	AC_MSG_WARN([*** Warning.  Your version of pppd is $PPPD_VERSION.  You will])
-	AC_MSG_WARN([*** not be able to use connect-on-demand.  Upgrade to pppd])
-	AC_MSG_WARN([*** 2.3.10 or newer if you need connect-on-demand.])
-	;;
-
-2*|3*|4*|5*|6*|7*|8*|9*)
-	;;
-
-*)
-	AC_MSG_WARN([*** Oops.  I cannot figure out what version of pppd you have.])
-	AC_MSG_WARN([*** All I got back was '$PPPD_VERSION'])
-	AC_MSG_WARN([*** I will keep going, but it may not work.])
-	;;
-esac
-
 # Sigh... got to fix this up for tcl
 test "x$prefix" = xNONE && prefix=$ac_default_prefix
 # Let make expand exec_prefix.
