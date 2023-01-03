@@ -55,18 +55,18 @@ typedef struct ClientConnection {
 } ClientConnection;
 
 int control_socket_handle_command(ClientConnection *client, const char* const* argv, int argi,
-	void *_subs, void *unused)
+                                  void *_subs, void *unused __attribute__((unused)))
 {
     ControlCommand* subs = _subs;
     ControlCommand* selected = NULL;
-    ControlCommand *i;
+    ControlCommand *cc;
     size_t wlen = 0;
     bool listall = true;
     if (argv[argi]) {
 	wlen = strlen(argv[argi]);
 
-	for (i = subs; i->command; ++i) {
-	    if (strncmp(i->command, argv[argi], wlen) == 0) {
+	for (cc = subs; cc->command; ++cc) {
+	    if (strncmp(cc->command, argv[argi], wlen) == 0) {
 		/* the word starts with the provided input */
 		/* if we previously found a match, it means the command is
 		 * ambiguous, so drop-through and output list of available next
@@ -76,7 +76,7 @@ int control_socket_handle_command(ClientConnection *client, const char* const* a
 		    listall = false;
 		    break;
 		}
-		selected = i;
+		selected = cc;
 	    }
 	}
 
@@ -95,10 +95,10 @@ int control_socket_handle_command(ClientConnection *client, const char* const* a
     } else {
 	cs_ret_printf(client, "No command specified, base commands:\n");
     }
-    for (i = subs; i->command; ++i) {
-	if (!listall && argv[argi] && strncmp(argv[argi], i->command, wlen) != 0)
+    for (cc = subs; cc->command; ++cc) {
+	if (!listall && argv[argi] && strncmp(argv[argi], cc->command, wlen) != 0)
 	    continue;
-	cs_ret_printf(client, "  %s\n", i->command);
+	cs_ret_printf(client, "  %s\n", cc->command);
     }
     cs_ret_printf(client, "-- end --\n");
     return 0;
