@@ -55,16 +55,17 @@ typedef struct ClientConnection {
 } ClientConnection;
 
 int control_socket_handle_command(ClientConnection *client, const char* const* argv, int argi,
-	void* _subs, void*)
+	void *_subs, void *unused)
 {
     ControlCommand* subs = _subs;
     ControlCommand* selected = NULL;
+    ControlCommand *i;
     size_t wlen = 0;
     bool listall = true;
     if (argv[argi]) {
 	wlen = strlen(argv[argi]);
 
-	for (ControlCommand *i = subs; i->command; ++i) {
+	for (i = subs; i->command; ++i) {
 	    if (strncmp(i->command, argv[argi], wlen) == 0) {
 		/* the word starts with the provided input */
 		/* if we previously found a match, it means the command is
@@ -85,15 +86,16 @@ int control_socket_handle_command(ClientConnection *client, const char* const* a
 	cs_ret_printf(client, "%s '%s' not found or ambiguous, possible options:\n",
 		argi ? "Sub-command" : "Command", argv[argi]);
     } else if (argi) {
+        int i;
 	cs_ret_printf(client, "Incomplete command after '");
-	for (int i = 0; i < argi; ++i) {
+	for (i = 0; i < argi; ++i) {
 	    cs_ret_printf(client, "%s%s", i ? " " : "", argv[i]);
 	}
 	cs_ret_printf(client, "', possible completions:\n");
     } else {
 	cs_ret_printf(client, "No command specified, base commands:\n");
     }
-    for (ControlCommand *i = subs; i->command; ++i) {
+    for (i = subs; i->command; ++i) {
 	if (!listall && argv[argi] && strncmp(argv[argi], i->command, wlen) != 0)
 	    continue;
 	cs_ret_printf(client, "  %s\n", i->command);
@@ -104,9 +106,10 @@ int control_socket_handle_command(ClientConnection *client, const char* const* a
 
 void control_socket_cleanup_client(ClientConnection *client, int fd)
 {
+    int i;
     printErr("Closing UNIX control connection.");
     close(fd);
-    for (int i = client->ctxi; i >= 0; --i) {
+    for (i = client->ctxi; i >= 0; --i) {
 	if (client->context[i].exithandler)
 	    client->context[i].exithandler(client, client->context[i].clientpvt);
     }
@@ -118,7 +121,7 @@ void control_socket_cleanup_client(ClientConnection *client, int fd)
 int control_socket_push_context(ClientConnection *client,
 	control_socket_exit_handler exitfunc, ControlCommand* newroot, void* clientpvt)
 {
-    ClientContext *t = reallocarray(client->context, client->ctxi + 2, sizeof(*client->context));
+  ClientContext *t = realloc(client->context, (client->ctxi + 2) * sizeof(*client->context));
     if (!t) {
 	printErr("Memory allocation error trying to push UNIX control context.");
 	return -1;
