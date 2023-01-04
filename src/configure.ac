@@ -23,10 +23,10 @@ AC_CHECK_HEADERS(fcntl.h sys/dlpi.h sys/ioctl.h sys/time.h syslog.h unistd.h net
 AC_CHECK_HEADERS(linux/if.h, [], [], [#include<sys/socket.h>])
 AC_CHECK_HEADERS(linux/if_pppox.h, [], [],
 [
-#include<sys/socket.h>
-#include<net/ethernet.h>
-#include<linux/if.h>
-#include<linux/in.h>
+#include <sys/socket.h>
+#include <net/ethernet.h>
+#include <net/if.h>
+#include <netinet/in.h>
 ])
 
 dnl Checks for typedefs, structures, and compiler characteristics.

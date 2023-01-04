@@ -3806,10 +3806,10 @@ done
 for ac_header in linux/if_pppox.h
 do :
   ac_fn_c_check_header_compile "$LINENO" "linux/if_pppox.h" "ac_cv_header_linux_if_pppox_h" "
-#include<sys/socket.h>
-#include<net/ethernet.h>
-#include<linux/if.h>
-#include<linux/in.h>
+#include <sys/socket.h>
+#include <net/ethernet.h>
+#include <net/if.h>
+#include <netinet/in.h>
 
 "
 if test "x$ac_cv_header_linux_if_pppox_h" = xyes; then :
