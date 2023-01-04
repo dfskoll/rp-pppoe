@@ -609,6 +609,7 @@ pktLogErrs(char const *pkt,
 	break;
     case TAG_GENERIC_ERROR:
 	str = "Generic-Error";
+        break;
     default:
         return;
     }
