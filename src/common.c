@@ -607,8 +607,10 @@ pktLogErrs(char const *pkt,
     case TAG_AC_SYSTEM_ERROR:
 	str = "System-Error";
 	break;
-    default:
+    case TAG_GENERIC_ERROR:
 	str = "Generic-Error";
+    default:
+        return;
     }
 
     syslog(LOG_ERR, fmt, pkt, str, (int) len, data);
