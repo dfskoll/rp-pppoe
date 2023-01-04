@@ -361,7 +361,8 @@ incrementIPAddress(unsigned char ip[IPV4ALEN])
 static int
 ipIsNull(const unsigned char ip[IPV4ALEN])
 {
-    for (int i = 0; i < IPV4ALEN; ++i)
+    int i;
+    for (i = 0; i < IPV4ALEN; ++i)
 	if (ip[i])
 	    return 0;
     return 1;
@@ -2477,7 +2478,8 @@ static int handle_status(ClientConnection *client, const char* const* argv, int 
     opt_status("interface count", "%d", NumInterfaces);
     opt_status("global drain", "%s", drain_string[draining]);
     if (opt_matches("interface list")) {
-	for (int i = 0; i < NumInterfaces; ++i) {
+        int i;
+	for (i = 0; i < NumInterfaces; ++i) {
 	    if (!opt_matches(interfaces[i].name))
 		continue;
 	    cs_ret_printf(client, "Interface details: %s\n", interfaces[i].name);

@@ -147,6 +147,7 @@ modprobe pppoe > /dev/null 2>&1
 fi
 AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/socket.h>
 #include <netinet/in.h>
+#include <net/if.h>
 #include <linux/if_pppox.h>
 int main()
 {
