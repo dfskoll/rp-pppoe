@@ -1302,6 +1302,7 @@ main(int argc, char **argv)
     char *pidfile = NULL;
     char *unix_control = NULL;
     char c;
+    int cookie_ok = 0;
 
 #ifdef HAVE_LICENSE
     int use_clustering = 0;
@@ -1657,11 +1658,13 @@ main(int argc, char **argv)
     fp = fopen("/dev/urandom", "r");
     if (fp) {
 	unsigned int x;
-	fread(&x, 1, sizeof(x), fp);
+	cookie_ok = 1;
+	if (fread(&x, 1, sizeof(x), fp) < sizeof(x)) cookie_ok = 0;
 	srand(x);
-	fread(&CookieSeed, 1, SEED_LEN, fp);
+	if (fread(&CookieSeed, 1, SEED_LEN, fp) < SEED_LEN) cookie_ok = 0;
 	fclose(fp);
-    } else {
+    }
+    if (!cookie_ok) {
 	srand((unsigned int) getpid() * (unsigned int) time(NULL));
 	CookieSeed[0] = getpid() & 0xFF;
 	CookieSeed[1] = (getpid() >> 8) & 0xFF;
@@ -1836,8 +1839,10 @@ main(int argc, char **argv)
 	    exit(EXIT_SUCCESS);
 	}
 
-	chdir("/");
-
+	if (chdir("/") < 0) {
+	    fatalSys("chdir");
+	}
+	
 	if (KidPipe[0] >= 0) {
 	    close(KidPipe[0]);
 	    KidPipe[0] = -1;
@@ -1876,9 +1881,18 @@ main(int argc, char **argv)
 	    if (foo) fprintf(foo, "ECould not lock PID file %s: Is another process running?\n", pidfile);
 	    exit(1);
 	}
-	ftruncate(LockFD, 0);
+	if (ftruncate(LockFD, 0) < 0) {
+	    syslog(LOG_INFO, "Could not truncate PID file %s: %s", pidfile, strerror(errno));
+	    if (foo) fprintf(foo, "ECould not truncate PID file %s: %s", pidfile, strerror(errno));
+	    exit(1);
+        }
 	snprintf(buf, sizeof(buf), "%lu\n", (unsigned long) getpid());
-	write(LockFD, buf, strlen(buf));
+	if (write(LockFD, buf, strlen(buf)) < strlen(buf)) {
+	    syslog(LOG_INFO, "Could not write PID file %s: %s", pidfile, strerror(errno));
+	    if (foo) fprintf(foo, "ECould not write PID file %s: %s", pidfile, strerror(errno));
+	    exit(1);
+	}
+
 	/* Do not close fd... use it to retain lock */
     }
 
@@ -1890,8 +1904,10 @@ main(int argc, char **argv)
 
     /* Tell parent all is cool */
     if (KidPipe[1] >= 0) {
+#pragma GCC diagnostic ignored "-Wunused-result"      
 	write(KidPipe[1], "X", 1);
 	close(KidPipe[1]);
+#pragma GCC diagnostic warning "-Wunused-result"      
 	KidPipe[1] = -1;
     }
 

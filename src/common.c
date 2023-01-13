@@ -222,13 +222,18 @@ dropPrivs(void)
     if (geteuid() == 0) {
 	pw = getpwnam("nobody");
 	if (pw) {
-	    if (setgid(pw->pw_gid) < 0) ok++;
-	    if (setuid(pw->pw_uid) < 0) ok++;
+	    if (setgid(pw->pw_gid) >= 0) ok++;
+	    if (setuid(pw->pw_uid) >= 0) ok++;
 	}
     }
     if (ok < 2 && IsSetID) {
-	setegid(getgid());
-	seteuid(getuid());
+        ok = 0;
+	if (setegid(getgid()) >= 0) ok++;
+	if (seteuid(getuid()) >= 0) ok++;
+    }
+    if (ok < 2) {
+      printErr("unable to drop privileges");
+      exit(EXIT_FAILURE);
     }
 }
 

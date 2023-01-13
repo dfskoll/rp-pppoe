@@ -243,7 +243,7 @@ typedef struct PPPoEPacketStruct {
 typedef struct PPPoETagStruct {
     unsigned int type:16;	/* tag type */
     unsigned int length:16;	/* Length of payload */
-    unsigned char payload[ETH_JUMBO_LEN]; /* A LOT of room to spare */
+    unsigned char payload[ETH_DATA_LEN];
 } PPPoETag;
 /* Header size of a PPPoE tag */
 #define TAG_HDR_SIZE 4

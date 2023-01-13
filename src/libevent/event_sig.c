@@ -143,7 +143,9 @@ sig_handler(int sig)
 
     SignalHandlers[sig].fired = 1;
     int errno_save = errno;
+#pragma GCC diagnostic ignored "-Wunused-result"      
     write(Pipe[1], &sig, 1);
+#pragma GCC diagnostic warning "-Wunused-result"      
     errno = errno_save;
 }
 

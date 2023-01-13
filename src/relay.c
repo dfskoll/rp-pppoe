@@ -340,7 +340,9 @@ main(int argc, char *argv[])
 	    exit(0);
 	}
 
-	chdir("/");
+	if (chdir("/") < 0) {
+	    fatalSys("chdir");
+	}
 	closelog();
 	for (i=0; i<CLOSEFD; i++) {
 	    if (!keepDescriptor(i)) {
@@ -799,7 +801,9 @@ relayLoop()
 	if (FD_ISSET(CleanPipe[0], &readableCopy)) {
 	    char dummy;
 	    CleanCounter = 0;
+#pragma GCC diagnostic ignored "-Wunused-result"      
 	    read(CleanPipe[0], &dummy, 1);
+#pragma GCC diagnostic warning "-Wunused-result"      
 	    if (IdleTimeout) cleanSessions();
 	}
     }
@@ -1525,7 +1529,9 @@ alarmHandler(int sig)
     Epoch++;
     CleanCounter++;
     if (CleanCounter == CleanPeriod) {
+#pragma GCC diagnostic ignored "-Wunused-result"      
 	write(CleanPipe[1], "", 1);
+#pragma GCC diagnostic warning "-Wunused-result"      
     }
 }
 
