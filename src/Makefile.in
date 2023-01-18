@@ -51,9 +51,8 @@ PATHS='-DPPPOE_PATH="$(PPPOE_PATH)"' '-DPPPD_PATH="$(PPPD_PATH)"' \
 	'-DPLUGIN_PATH="$(PLUGIN_PATH)"' \
 	'-DPPPOE_SERVER_OPTIONS="$(PPPOESERVER_PPPD_OPTIONS)"'
 
-CFLAGS= @CFLAGS@ $(LIC_INCDIR) $(DEFINES) $(LIC_DEFINE) $(PATHS) -Ilibevent
+CFLAGS= @CFLAGS@ $(DEFINES) $(PATHS) -Ilibevent
 TARGETS=@TARGETS@
-PPPOE_SERVER_LIBS=$(LIC_LIBDIR) $(LIC_LIB)
 LDFLAGS= @LDFLAGS@
 
 all: $(TARGETS)
@@ -64,7 +63,7 @@ pppoe-sniff: pppoe-sniff.o if.o common.o debug.o
 	@CC@ -o $@ $^ $(LDFLAGS)
 
 pppoe-server: pppoe-server.o if.o debug.o common.o md5.o control_socket.o libevent/libevent.a @PPPOE_SERVER_DEPS@
-	@CC@ -o $@ @RDYNAMIC@ $^ $(LDFLAGS) $(PPPOE_SERVER_LIBS) -Llibevent -levent
+	@CC@ -o $@ @RDYNAMIC@ $^ $(LDFLAGS) -Llibevent -levent
 
 pppoe: pppoe.o if.o debug.o common.o ppp.o discovery.o
 	@CC@ -o $@ $^ $(LDFLAGS)
