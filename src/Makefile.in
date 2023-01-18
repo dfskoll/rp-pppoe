@@ -66,11 +66,6 @@ pppoe-sniff: pppoe-sniff.o if.o common.o debug.o
 pppoe-server: pppoe-server.o if.o debug.o common.o md5.o control_socket.o libevent/libevent.a @PPPOE_SERVER_DEPS@
 	@CC@ -o $@ @RDYNAMIC@ $^ $(LDFLAGS) $(PPPOE_SERVER_LIBS) -Llibevent -levent
 
-# Experimental code from Savoir Faire Linux.  I do not consider it
-# production-ready, so not part of the official distribution.
-#pppoe-bridge: pppoe-bridge.o ppp.o modem.o rs232.o if.o debug.o common.o md5.o libevent/libevent.a @PPPOE_SERVER_DEPS@
-#	@CC@ -o $@ @RDYNAMIC@ $^ $(LDFLAGS) $(PPPOE_SERVER_LIBS) -Llibevent -levent
-
 pppoe: pppoe.o if.o debug.o common.o ppp.o discovery.o
 	@CC@ -o $@ $^ $(LDFLAGS)
 
@@ -91,11 +86,6 @@ md5.o: md5.c md5.h
 
 pppoe-server.o: pppoe-server.c pppoe.h @PPPOE_SERVER_DEPS@
 	@CC@ $(CFLAGS) '-DRP_VERSION="$(RP_VERSION)"' -c -o $@ $<
-
-# Experimental code from Savoir Faire Linux.  I do not consider it
-# production-ready, so not part of the official distribution.
-#pppoe-bridge.o: pppoe-bridge.c pppoe.h @PPPOE_SERVER_DEPS@
-#	@CC@ $(CFLAGS) '-DRP_VERSION="$(RP_VERSION)"' -c -o $@ $<
 
 pppoe-sniff.o: pppoe-sniff.c pppoe.h
 	@CC@ $(CFLAGS) '-DRP_VERSION="$(RP_VERSION)"' -c -o $@ $<
