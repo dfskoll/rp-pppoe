@@ -19,10 +19,6 @@
 #include "pppoe.h"
 #include "event.h"
 
-#ifdef HAVE_L2TP
-#include "l2tp/l2tp.h"
-#endif
-
 #define MAX_USERNAME_LEN 31
 /* An Ethernet interface */
 typedef struct {
@@ -31,12 +27,6 @@ typedef struct {
     unsigned char mac[ETH_ALEN]; /* MAC address */
     EventHandler *eh;		/* Event handler for this interface */
     UINT16_t mtu;               /* MTU of interface */
-
-    /* Next fields are used only if we're an L2TP LAC */
-#ifdef HAVE_L2TP
-    int session_sock;		/* Session socket */
-    EventHandler *lac_eh;	/* LAC's event-handler */
-#endif
 } Interface;
 
 #define FLAG_RECVD_PADT      1
@@ -81,17 +71,6 @@ typedef struct ClientSessionStruct {
     time_t startTime;		/* When session started */
     char const *serviceName;	/* Service name */
     UINT16_t requested_mtu;     /* Requested PPP_MAX_PAYLOAD  per RFC 4638 */
-#ifdef HAVE_LICENSE
-    char user[MAX_USERNAME_LEN+1]; /* Authenticated user-name */
-    char realm[MAX_USERNAME_LEN+1]; /* Realm */
-    unsigned char realpeerip[IPV4ALEN];	/* Actual IP address -- may be assigned
-					   by RADIUS server */
-    int maxSessionsPerUser;	/* Max sessions for this user */
-#endif
-#ifdef HAVE_L2TP
-    l2tp_session *l2tp_ses;	/* L2TP session */
-    struct sockaddr_in tunnel_endpoint;	/* L2TP endpoint */
-#endif
 } ClientSession;
 
 /* Hack for daemonizing */
@@ -154,6 +133,3 @@ extern ClientSession *pppoe_alloc_session(void);
 extern int pppoe_free_session(ClientSession *ses);
 extern void sendHURLorMOTM(PPPoEConnection *conn, char const *url, UINT16_t tag);
 
-#ifdef HAVE_LICENSE
-extern int getFreeMem(void);
-#endif
