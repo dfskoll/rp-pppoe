@@ -36,7 +36,7 @@ typedef struct SessionStruct {
     struct SessionHashStruct *acHash; /* Hash bucket for AC MAC/Session */
     struct SessionHashStruct *clientHash; /* Hash bucket for client MAC/Session */
     unsigned int epoch;		/* Epoch when last activity was seen */
-    UINT16_t sesNum;		/* Session number assigned by relay */
+    uint16_t sesNum;		/* Session number assigned by relay */
 } PPPoESession;
 
 /* Hash table entry to find sessions */
@@ -46,7 +46,7 @@ typedef struct SessionHashStruct {
     struct SessionHashStruct *peer; /* Peer for this session */
     PPPoEInterface const *interface;	/* Interface */
     unsigned char peerMac[ETH_ALEN]; /* Peer's MAC address */
-    UINT16_t sesNum;		/* Session number */
+    uint16_t sesNum;		/* Session number */
     PPPoESession *ses;		/* Session data */
 } SessionHash;
 
@@ -55,14 +55,14 @@ typedef struct SessionHashStruct {
 void relayGotSessionPacket(PPPoEInterface const *i);
 void relayGotDiscoveryPacket(PPPoEInterface const *i);
 PPPoEInterface *findInterface(int sock);
-unsigned int hash(unsigned char const *mac, UINT16_t sesNum);
-SessionHash *findSession(unsigned char const *mac, UINT16_t sesNum);
+unsigned int hash(unsigned char const *mac, uint16_t sesNum);
+SessionHash *findSession(unsigned char const *mac, uint16_t sesNum);
 void deleteHash(SessionHash *hash);
 PPPoESession *createSession(PPPoEInterface const *ac,
 			    PPPoEInterface const *cli,
 			    unsigned char const *acMac,
 			    unsigned char const *cliMac,
-			    UINT16_t acSes);
+			    uint16_t acSes);
 void freeSession(PPPoESession *ses, char const *msg);
 void addInterface(char const *ifname, int clientOK, int acOK);
 void usage(char const *progname);
@@ -83,7 +83,7 @@ int insertBytes(PPPoEPacket *packet, unsigned char *loc,
 int removeBytes(PPPoEPacket *packet, unsigned char *loc,
 		int length);
 void relaySendError(unsigned char code,
-		    UINT16_t session,
+		    uint16_t session,
 		    PPPoEInterface const *iface,
 		    unsigned char const *mac,
 		    PPPoETag const *hostUniq,

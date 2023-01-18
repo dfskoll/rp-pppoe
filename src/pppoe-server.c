@@ -133,7 +133,7 @@ EventSelector *event_selector;
 static int UseLinuxKernelModePPPoE = 0;
 
 /* Requested max_ppp_payload */
-static UINT16_t max_ppp_payload = 0;
+static uint16_t max_ppp_payload = 0;
 
 /* File with PPPD options */
 static char *pppoptfile = NULL;
@@ -451,7 +451,7 @@ parseAddressPool(char const *fname, int install)
 * Picks interesting tags out of a PADI packet
 ***********************************************************************/
 void
-parsePADITags(UINT16_t type, UINT16_t len, unsigned char *data,
+parsePADITags(uint16_t type, uint16_t len, unsigned char *data,
 	      void *extra)
 {
     switch(type) {
@@ -496,7 +496,7 @@ parsePADITags(UINT16_t type, UINT16_t len, unsigned char *data,
 * Picks interesting tags out of a PADR packet
 ***********************************************************************/
 void
-parsePADRTags(UINT16_t type, UINT16_t len, unsigned char *data,
+parsePADRTags(uint16_t type, uint16_t len, unsigned char *data,
 	      void *extra)
 {
     switch(type) {
@@ -630,7 +630,7 @@ processPADI(Interface *ethif, PPPoEPacket *packet, int len)
     PPPoETag cookie;
     size_t acname_len;
     unsigned char *cursor = pado.payload;
-    UINT16_t plen;
+    uint16_t plen;
 
     int sock = ethif->sock;
     int i;
@@ -736,7 +736,7 @@ processPADI(Interface *ethif, PPPoEPacket *packet, int len)
 	}
 	if (max_ppp_payload > ETH_PPPOE_MTU) {
 	    PPPoETag maxPayload;
-	    UINT16_t mru = htons(max_ppp_payload);
+	    uint16_t mru = htons(max_ppp_payload);
 	    maxPayload.type = htons(TAG_PPP_MAX_PAYLOAD);
 	    maxPayload.length = htons(sizeof(mru));
 	    memcpy(maxPayload.payload, &mru, sizeof(mru));
@@ -864,7 +864,7 @@ processPADR(Interface *ethif, PPPoEPacket *packet, int len)
     pid_t child;
     PPPoEPacket pads;
     unsigned char *cursor = pads.payload;
-    UINT16_t plen;
+    uint16_t plen;
     int i;
     int sock = ethif->sock;
     unsigned char *myAddr = ethif->mac;
@@ -1047,7 +1047,7 @@ processPADR(Interface *ethif, PPPoEPacket *packet, int len)
 	}
 	if (max_ppp_payload > ETH_PPPOE_MTU) {
 	    PPPoETag maxPayload;
-	    UINT16_t mru = htons(max_ppp_payload);
+	    uint16_t mru = htons(max_ppp_payload);
 	    maxPayload.type = htons(TAG_PPP_MAX_PAYLOAD);
 	    maxPayload.length = htons(sizeof(mru));
 	    memcpy(maxPayload.payload, &mru, sizeof(mru));
@@ -1346,8 +1346,8 @@ main(int argc, char **argv)
 		fprintf(stderr, "Illegal argument to -f: Should be disc:sess in hex\n");
 		exit(EXIT_FAILURE);
 	    }
-	    Eth_PPPOE_Discovery = (UINT16_t) discoveryType;
-	    Eth_PPPOE_Session   = (UINT16_t) sessionType;
+	    Eth_PPPOE_Discovery = (uint16_t) discoveryType;
+	    Eth_PPPOE_Session   = (uint16_t) sessionType;
 	    /* This option gets passed to pppoe */
 	    snprintf(PppoeOptions + strlen(PppoeOptions),
 		     SMALLBUF-strlen(PppoeOptions),
@@ -1835,7 +1835,7 @@ sendErrorPADS(int sock,
 {
     PPPoEPacket pads;
     unsigned char *cursor = pads.payload;
-    UINT16_t plen;
+    uint16_t plen;
     PPPoETag err;
     int elen = strlen(errorMsg);
 
@@ -2185,13 +2185,13 @@ pppoe_free_session(ClientSession *ses)
 *  Sends a PADM packet contaning a HURL or MOTM tag to the victim...er, peer.
 ***********************************************************************/
 void
-sendHURLorMOTM(PPPoEConnection *conn, char const *url, UINT16_t tag)
+sendHURLorMOTM(PPPoEConnection *conn, char const *url, uint16_t tag)
 {
     PPPoEPacket packet;
     PPPoETag hurl;
     size_t elen;
     unsigned char *cursor = packet.payload;
-    UINT16_t plen = 0;
+    uint16_t plen = 0;
 
     if (!conn->session) return;
     if (conn->discoverySocket < 0) return;

@@ -26,7 +26,7 @@ typedef struct {
     int sock;			/* Socket for discovery frames */
     unsigned char mac[ETH_ALEN]; /* MAC address */
     EventHandler *eh;		/* Event handler for this interface */
-    UINT16_t mtu;               /* MTU of interface */
+    uint16_t mtu;               /* MTU of interface */
 } Interface;
 
 #define FLAG_RECVD_PADT      1
@@ -65,12 +65,12 @@ typedef struct ClientSessionStruct {
     Interface *ethif;		/* Ethernet interface */
     unsigned char myip[IPV4ALEN]; /* Local IP address */
     unsigned char peerip[IPV4ALEN]; /* Desired IP address of peer */
-    UINT16_t sess;		/* Session number */
+    uint16_t sess;		/* Session number */
     unsigned char eth[ETH_ALEN]; /* Peer's Ethernet address */
     unsigned int flags;		/* Various flags */
     time_t startTime;		/* When session started */
     char const *serviceName;	/* Service name */
-    UINT16_t requested_mtu;     /* Requested PPP_MAX_PAYLOAD  per RFC 4638 */
+    uint16_t requested_mtu;     /* Requested PPP_MAX_PAYLOAD  per RFC 4638 */
 } ClientSession;
 
 /* Hack for daemonizing */
@@ -131,5 +131,5 @@ extern void processPADI(Interface *ethif, PPPoEPacket *packet, int len);
 extern void usage(char const *msg);
 extern ClientSession *pppoe_alloc_session(void);
 extern int pppoe_free_session(ClientSession *ses);
-extern void sendHURLorMOTM(PPPoEConnection *conn, char const *url, UINT16_t tag);
+extern void sendHURLorMOTM(PPPoEConnection *conn, char const *url, uint16_t tag);
 

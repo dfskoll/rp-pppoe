@@ -99,7 +99,7 @@ time_left(struct timeval *tv, struct timeval *expire_at)
 * If a HostUnique tag is found which matches our PID, sets *extra to 1.
 ***********************************************************************/
 static void
-parseForHostUniq(UINT16_t type, UINT16_t len, unsigned char *data,
+parseForHostUniq(uint16_t type, uint16_t len, unsigned char *data,
 		 void *extra)
 {
     struct HostUniqInfo *hi = (struct HostUniqInfo *) extra;
@@ -153,14 +153,14 @@ packetIsForMe(PPPoEConnection *conn, PPPoEPacket *packet)
 * Picks interesting tags out of a PADO packet
 ***********************************************************************/
 static void
-parsePADOTags(UINT16_t type, UINT16_t len, unsigned char *data,
+parsePADOTags(uint16_t type, uint16_t len, unsigned char *data,
 	      void *extra)
 {
     struct PacketCriteria *pc = (struct PacketCriteria *) extra;
     PPPoEConnection *conn = pc->conn;
     int i;
 #ifdef PLUGIN
-    UINT16_t mru;
+    uint16_t mru;
 #endif
 
     switch(type) {
@@ -274,11 +274,11 @@ parsePADOTags(UINT16_t type, UINT16_t len, unsigned char *data,
 * Picks interesting tags out of a PADS packet
 ***********************************************************************/
 static void
-parsePADSTags(UINT16_t type, UINT16_t len, unsigned char *data,
+parsePADSTags(uint16_t type, uint16_t len, unsigned char *data,
 	      void *extra)
 {
 #ifdef PLUGIN
-    UINT16_t mru;
+    uint16_t mru;
 #endif
     PPPoEConnection *conn = (PPPoEConnection *) extra;
     switch(type) {
@@ -327,12 +327,12 @@ sendPADI(PPPoEConnection *conn)
     PPPoEPacket packet;
     unsigned char *cursor = packet.payload;
     PPPoETag *svc = (PPPoETag *) (&packet.payload);
-    UINT16_t namelen = 0;
-    UINT16_t plen;
+    uint16_t namelen = 0;
+    uint16_t plen;
     int omit_service_name = 0;
 
     if (conn->serviceName) {
-	namelen = (UINT16_t) strlen(conn->serviceName);
+	namelen = (uint16_t) strlen(conn->serviceName);
 	if (!strcmp(conn->serviceName, "NO-SERVICE-NAME-NON-RFC-COMPLIANT")) {
 	    omit_service_name = 1;
 	}
@@ -379,7 +379,7 @@ sendPADI(PPPoEConnection *conn)
     /* Add our maximum MTU/MRU */
     if (MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru) > ETH_PPPOE_MTU) {
 	PPPoETag maxPayload;
-	UINT16_t mru = htons(MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru));
+	uint16_t mru = htons(MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru));
 	maxPayload.type = htons(TAG_PPP_MAX_PAYLOAD);
 	maxPayload.length = htons(sizeof(mru));
 	memcpy(maxPayload.payload, &mru, sizeof(mru));
@@ -435,27 +435,25 @@ waitForPADO(PPPoEConnection *conn, int timeout)
     expire_at.tv_sec += timeout;
 
     do {
-	if (BPF_BUFFER_IS_EMPTY) {
-	    if(!time_left(&tv, &expire_at)) {
-		/* Timed out */
-		return;
-	    }
+        if(!time_left(&tv, &expire_at)) {
+            /* Timed out */
+            return;
+        }
 
-	    FD_ZERO(&readable);
-	    FD_SET(conn->discoverySocket, &readable);
+        FD_ZERO(&readable);
+        FD_SET(conn->discoverySocket, &readable);
 
-	    while(1) {
-		r = select(conn->discoverySocket+1, &readable, NULL, NULL, &tv);
-		if (r >= 0 || errno != EINTR) break;
-	    }
-	    if (r < 0) {
-		fatalSys("select (waitForPADO)");
-	    }
-	    if (r == 0) {
-		/* Timed out */
-		return;
-	    }
-	}
+        while(1) {
+            r = select(conn->discoverySocket+1, &readable, NULL, NULL, &tv);
+            if (r >= 0 || errno != EINTR) break;
+        }
+        if (r < 0) {
+            fatalSys("select (waitForPADO)");
+        }
+        if (r == 0) {
+            /* Timed out */
+            return;
+        }
 
 	/* Get the packet */
 	receivePacket(conn->discoverySocket, &packet, &len);
@@ -550,11 +548,11 @@ sendPADR(PPPoEConnection *conn)
     PPPoETag *svc = (PPPoETag *) packet.payload;
     unsigned char *cursor = packet.payload;
 
-    UINT16_t namelen = 0;
-    UINT16_t plen;
+    uint16_t namelen = 0;
+    uint16_t plen;
 
     if (conn->serviceName) {
-	namelen = (UINT16_t) strlen(conn->serviceName);
+	namelen = (uint16_t) strlen(conn->serviceName);
     }
     plen = TAG_HDR_SIZE + namelen;
     CHECK_ROOM(cursor, packet.payload, plen);
@@ -608,7 +606,7 @@ sendPADR(PPPoEConnection *conn)
     /* Add our maximum MTU/MRU */
     if (MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru) > ETH_PPPOE_MTU) {
 	PPPoETag maxPayload;
-	UINT16_t mru = htons(MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru));
+	uint16_t mru = htons(MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru));
 	maxPayload.type = htons(TAG_PPP_MAX_PAYLOAD);
 	maxPayload.length = htons(sizeof(mru));
 	memcpy(maxPayload.payload, &mru, sizeof(mru));
@@ -657,27 +655,25 @@ waitForPADS(PPPoEConnection *conn, int timeout)
     expire_at.tv_sec += timeout;
 
     do {
-	if (BPF_BUFFER_IS_EMPTY) {
-	    if(!time_left(&tv, &expire_at)) {
-		/* Timed out */
-		return;
-	    }
+        if(!time_left(&tv, &expire_at)) {
+            /* Timed out */
+            return;
+        }
 
-	    FD_ZERO(&readable);
-	    FD_SET(conn->discoverySocket, &readable);
+        FD_ZERO(&readable);
+        FD_SET(conn->discoverySocket, &readable);
 
-	    while(1) {
-		r = select(conn->discoverySocket+1, &readable, NULL, NULL, &tv);
-		if (r >= 0 || errno != EINTR) break;
-	    }
-	    if (r < 0) {
-		fatalSys("select (waitForPADS)");
-	    }
-	    if (r == 0) {
-		/* Timed out */
-		return;
-	    }
-	}
+        while(1) {
+            r = select(conn->discoverySocket+1, &readable, NULL, NULL, &tv);
+            if (r >= 0 || errno != EINTR) break;
+        }
+        if (r < 0) {
+            fatalSys("select (waitForPADS)");
+        }
+        if (r == 0) {
+            /* Timed out */
+            return;
+        }
 
 	/* Get the packet */
 	receivePacket(conn->discoverySocket, &packet, &len);

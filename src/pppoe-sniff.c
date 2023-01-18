@@ -18,21 +18,12 @@
 #define _GNU_SOURCE 1
 #include "pppoe.h"
 
-#ifdef HAVE_GETOPT_H
 #include <getopt.h>
-#endif
 
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-
-#ifdef USE_DLPI
-#include <sys/dlpi.h>
-/* function declarations */
-void dlpromisconreq( int fd, u_long  level);
-void dlokack(int fd, char *bufp);
-#endif
 
 /* Default interface if no -I option given */
 #define DEFAULT_IF "eth0"
@@ -40,7 +31,7 @@ void dlokack(int fd, char *bufp);
 /* Global vars */
 int SeenPADR = 0;
 int SeenSess = 0;
-UINT16_t SessType, DiscType;
+uint16_t SessType, DiscType;
 
 char *IfName = NULL;		/* Interface name */
 char *ServiceName = NULL;	/* Service name   */
@@ -58,7 +49,7 @@ char *ServiceName = NULL;	/* Service name   */
 * Picks interesting tags out of a PADR packet
 ***********************************************************************/
 void
-parsePADRTags(UINT16_t type, UINT16_t len, unsigned char *data,
+parsePADRTags(uint16_t type, uint16_t len, unsigned char *data,
 	      void *extra)
 {
     switch(type) {
@@ -130,17 +121,6 @@ usage(char const *argv0)
     exit(0);
 }
 
-#if !defined(USE_LINUX_PACKET) && !defined(USE_DLPI)
-
-int
-main()
-{
-    fprintf(stderr, "Sorry, pppoe-sniff works only on Linux.\n");
-    return 1;
-}
-
-#else
-
 /**********************************************************************
 *%FUNCTION: main
 *%ARGUMENTS:
@@ -157,9 +137,6 @@ main(int argc, char *argv[])
     int sock;
     PPPoEPacket pkt;
     int size;
-#ifdef USE_DLPI
-    long buf[MAXDLBUF];
-#endif
 
     if (getuid() != geteuid() ||
 	getgid() != getegid()) {
@@ -185,18 +162,7 @@ main(int argc, char *argv[])
 	IfName = DEFAULT_IF;
     }
 
-    /* Open the interface */
-#ifdef USE_DLPI
-	sock = openInterface(IfName, Eth_PPPOE_Discovery, NULL);
-	dlpromisconreq(sock, DL_PROMISC_PHYS);
-	dlokack(sock, (char *)buf);
-	dlpromisconreq(sock, DL_PROMISC_SAP);
-	dlokack(sock, (char *)buf);
-#else
-
-	sock = openInterface(IfName, ETH_P_ALL,  NULL, NULL);
-
-#endif
+    sock = openInterface(IfName, ETH_P_ALL,  NULL, NULL);
 
     /* We assume interface is in promiscuous mode -- use "ip link
        show" to ensure this */
@@ -245,7 +211,6 @@ main(int argc, char *argv[])
     return 0;
 }
 
-#endif
 /**********************************************************************
 *%FUNCTION: sysErr
 *%ARGUMENTS:
