@@ -115,11 +115,6 @@ AC_FUNC_MEMCMP
 AC_CHECK_FUNCS(select socket strerror strtol strlcpy)
 AC_PROG_INSTALL
 
-dnl Integer sizes
-AC_CHECK_SIZEOF(unsigned short)
-AC_CHECK_SIZEOF(unsigned int)
-AC_CHECK_SIZEOF(unsigned long)
-
 dnl Check for location of ip
 AC_PATH_PROG(IP, ip, NOTFOUND, $PATH:/bin:/sbin:/usr/bin:/usr/sbin)
 
