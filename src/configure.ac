@@ -19,7 +19,7 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(fcntl.h sys/dlpi.h sys/ioctl.h sys/time.h syslog.h unistd.h net/if_arp.h netinet/if_ether.h getopt.h sys/uio.h sys/param.h fcntl.h net/bpf.h netpacket/packet.h net/ethernet.h asm/types.h linux/if_packet.h linux/if_ether.h sys/socket.h net/if.h net/if_dl.h net/if_ether.h net/if_types.h netinet/if_ether.h net/if_types.h net/if_dl.h)
+AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h syslog.h unistd.h net/if_arp.h netinet/if_ether.h getopt.h sys/uio.h sys/param.h fcntl.h netpacket/packet.h net/ethernet.h asm/types.h linux/if_packet.h linux/if_ether.h sys/socket.h net/if.h net/if_dl.h net/if_ether.h net/if_types.h netinet/if_ether.h net/if_types.h net/if_dl.h)
 AC_CHECK_HEADERS(linux/if.h, [], [], [#include<sys/socket.h>])
 AC_CHECK_HEADERS(linux/if_pppox.h, [], [],
 [
@@ -188,17 +188,7 @@ eval "WRAPPER=${WRAPPER}"
 AC_SUBST(WRAPPER)
 
 # Determine what targets to build
-TARGETS="pppoe pppoe-server"
-
-# pppoe-sniff is built only on Linux and Solaris
-if test "$ac_cv_header_linux_if_packet_h" = "yes" -o "$ac_cv_header_sys_dlpi_h" = "yes" ; then
-	TARGETS="$TARGETS pppoe-sniff"
-fi
-
-# pppoe-relay is built only on Linux
-if test "$ac_cv_header_linux_if_packet_h" = "yes" ; then
-	TARGETS="$TARGETS pppoe-relay"
-fi
+TARGETS="pppoe pppoe-server pppoe-sniff pppoe-relay"
 
 # plugin is built only if we have kernel support
 if test -n "$LINUX_KERNELMODE_PLUGIN" ; then

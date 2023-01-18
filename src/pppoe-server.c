@@ -1139,12 +1139,8 @@ usage(char const *argv0)
 {
     fprintf(stderr, "Usage: %s [options]\n", argv0);
     fprintf(stderr, "Options:\n");
-#ifdef USE_BPF
-    fprintf(stderr, "   -I if_name     -- Specify interface (REQUIRED)\n");
-#else
     fprintf(stderr, "   -I if_name     -- Specify interface (default %s.)\n",
 	    DEFAULT_IF);
-#endif
     fprintf(stderr, "   -T timeout     -- Specify inactivity timeout in seconds.\n");
     fprintf(stderr, "   -C name        -- Set access concentrator name.\n");
     fprintf(stderr, "   -m MSS         -- Clamp incoming and outgoing MSS options.\n");

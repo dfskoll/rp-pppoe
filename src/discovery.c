@@ -465,11 +465,6 @@ waitForPADO(PPPoEConnection *conn, int timeout)
 	    continue;
 	}
 
-#ifdef USE_BPF
-	/* If it's not a Discovery packet, loop again */
-	if (etherType(&packet) != Eth_PPPOE_Discovery) continue;
-#endif
-
 #ifdef DEBUGGING_ENABLED
 	if (conn->debugFile) {
 	    dumpPacket(conn->debugFile, &packet, "RCVD");
@@ -685,10 +680,6 @@ waitForPADS(PPPoEConnection *conn, int timeout)
 	    continue;
 	}
 
-#ifdef USE_BPF
-	/* If it's not a Discovery packet, loop again */
-	if (etherType(&packet) != Eth_PPPOE_Discovery) continue;
-#endif
 #ifdef DEBUGGING_ENABLED
 	if (conn->debugFile) {
 	    dumpPacket(conn->debugFile, &packet, "RCVD");

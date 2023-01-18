@@ -50,7 +50,7 @@ uint16_t Eth_PPPOE_Session   = ETH_PPPOE_SESSION;
 * ethernet packet type (see /usr/include/net/ethertypes.h)
 *%DESCRIPTION:
 * Checks the ethernet packet header to determine its type.
-* We should only be receveing DISCOVERY and SESSION types if the BPF
+* We should only be receiving DISCOVERY and SESSION types if the BPF
 * is set up correctly.  Logs an error if an unexpected type is received.
 * Note that the ethernet type names come from "pppoe.h" and the packet
 * packet structure names use the LINUX dialect to maintain consistency

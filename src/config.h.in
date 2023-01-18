@@ -65,9 +65,6 @@
 /* Define if you have the <linux/if_pppox.h> header file.  */
 #undef HAVE_LINUX_IF_PPPOX_H
 
-/* Define if you have the <net/bpf.h> header file.  */
-#undef HAVE_NET_BPF_H
-
 /* Define if you have the <net/if_arp.h> header file.  */
 #undef HAVE_NET_IF_ARP_H
 
@@ -94,9 +91,6 @@
 
 /* Define if you have the <netpacket/packet.h> header file.  */
 #undef HAVE_NETPACKET_PACKET_H
-
-/* Define if you have the <sys/dlpi.h> header file.  */
-#undef HAVE_SYS_DLPI_H
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
