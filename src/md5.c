@@ -144,8 +144,6 @@ void MD5Final(unsigned char digest[16], struct MD5Context *ctx)
     memset(ctx, 0, sizeof(*ctx));	/* In case it's sensitive */
 }
 
-#ifndef ASM_MD5
-
 /* The four core functions - F1 is optimized somewhat */
 
 /* #define F1(x, y, z) (x & y | ~x & z) */
@@ -245,5 +243,3 @@ void MD5Transform(uint32_t buf[4], uint32_t const in[16])
     buf[2] += c;
     buf[3] += d;
 }
-
-#endif
