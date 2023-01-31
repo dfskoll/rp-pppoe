@@ -370,8 +370,8 @@ sendPADI(PPPoEConnection *conn)
 	int len = (int) strlen(conn->hostUniq);
 	hostUniq.type = htons(TAG_HOST_UNIQ);
 	hostUniq.length = htons(len);
-	memcpy(hostUniq.payload, conn->hostUniq, len);
 	CHECK_ROOM(cursor, packet.payload, len + TAG_HDR_SIZE);
+	memcpy(hostUniq.payload, conn->hostUniq, len);
 	memcpy(cursor, &hostUniq, len + TAG_HDR_SIZE);
 	cursor += len + TAG_HDR_SIZE;
 	plen += len + TAG_HDR_SIZE;
@@ -384,8 +384,8 @@ sendPADI(PPPoEConnection *conn)
 	uint16_t mru = htons(MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru));
 	maxPayload.type = htons(TAG_PPP_MAX_PAYLOAD);
 	maxPayload.length = htons(sizeof(mru));
-	memcpy(maxPayload.payload, &mru, sizeof(mru));
 	CHECK_ROOM(cursor, packet.payload, sizeof(mru) + TAG_HDR_SIZE);
+	memcpy(maxPayload.payload, &mru, sizeof(mru));
 	memcpy(cursor, &maxPayload, sizeof(mru) + TAG_HDR_SIZE);
 	cursor += sizeof(mru) + TAG_HDR_SIZE;
 	plen += sizeof(mru) + TAG_HDR_SIZE;
@@ -575,8 +575,8 @@ sendPADR(PPPoEConnection *conn)
 	int len = (int) strlen(conn->hostUniq);
 	hostUniq.type = htons(TAG_HOST_UNIQ);
 	hostUniq.length = htons(len);
-	memcpy(hostUniq.payload, conn->hostUniq, len);
 	CHECK_ROOM(cursor, packet.payload, len + TAG_HDR_SIZE);
+	memcpy(hostUniq.payload, conn->hostUniq, len);
 	memcpy(cursor, &hostUniq, len + TAG_HDR_SIZE);
 	cursor += len + TAG_HDR_SIZE;
 	plen += len + TAG_HDR_SIZE;
@@ -606,8 +606,8 @@ sendPADR(PPPoEConnection *conn)
 	uint16_t mru = htons(MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru));
 	maxPayload.type = htons(TAG_PPP_MAX_PAYLOAD);
 	maxPayload.length = htons(sizeof(mru));
-	memcpy(maxPayload.payload, &mru, sizeof(mru));
 	CHECK_ROOM(cursor, packet.payload, sizeof(mru) + TAG_HDR_SIZE);
+	memcpy(maxPayload.payload, &mru, sizeof(mru));
 	memcpy(cursor, &maxPayload, sizeof(mru) + TAG_HDR_SIZE);
 	cursor += sizeof(mru) + TAG_HDR_SIZE;
 	plen += sizeof(mru) + TAG_HDR_SIZE;
