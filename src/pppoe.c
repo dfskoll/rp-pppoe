@@ -564,8 +564,9 @@ main(int argc, char *argv[])
     /* server equipment).                                                  */
     /* Opening this socket just before waitForPADS in the discovery()      */
     /* function would be more appropriate, but it would mess-up the code   */
-    if (!optSkipSession)
+    if (!optSkipSession) {
         conn.sessionSocket = openInterface(conn.ifName, Eth_PPPOE_Session, conn.myEth, NULL);
+    }
 
     /* Skip discovery and don't open discovery socket? */
     if (conn.skipDiscovery && conn.noDiscoverySocket) {
