@@ -1203,6 +1203,7 @@ main(int argc, char **argv)
     char *pidfile = NULL;
     char *unix_control = NULL;
     char c;
+    char const *s;
     int cookie_ok = 0;
 
 #ifndef HAVE_LINUX_KERNEL_PPPOE
@@ -1259,6 +1260,16 @@ main(int argc, char **argv)
 			MAX_SERVICE_NAMES);
 		exit(1);
 	    }
+
+            /* Service names can only be [-_.A-Za-z0-9/] for shell-escaping
+               safety reasons */
+            for (s=optarg; *s; s++) {
+                if (!strchr("-_.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/", *s)) {
+                    fprintf(stderr, "Illegal character `%c' in service-name: Must be A-Z, a-z, 0-9 or one of ./-_\n", *s);
+                    exit(1);
+                }
+            }
+
 	    ServiceNames[NumServiceNames] = strdup(optarg);
 	    if (!ServiceNames[NumServiceNames]) {
 		fprintf(stderr, "Out of memory");
