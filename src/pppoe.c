@@ -460,6 +460,10 @@ main(int argc, char *argv[])
 		fprintf(stderr, "-U and -W are mutually-exclusive and may only be used once.\n");
 		exit(EXIT_FAILURE);
 	    }
+            if (strlen(optarg) > 64) {
+                fprintf(stderr, "Maximum length of -W argument is 64 bytes.\n");
+                exit(EXIT_FAILURE);
+            }
 	    SET_STRING(conn.hostUniq, optarg);
 	    break;
 #ifdef DEBUGGING_ENABLED
