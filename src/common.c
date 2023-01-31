@@ -20,8 +20,7 @@
 #define _ISOC99_SOURCE 1
 #define _GNU_SOURCE 1
 
-#include "pppoe.h"
-
+#include "config.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
@@ -38,6 +37,8 @@
 
 #include <sys/types.h>
 #include <pwd.h>
+
+#include "pppoe.h"
 
 /* Are we running SUID or SGID? */
 int IsSetID = 0;

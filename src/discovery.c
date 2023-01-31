@@ -13,7 +13,7 @@
 
 #define _GNU_SOURCE 1
 
-#include "pppoe.h"
+#include "config.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
@@ -42,6 +42,8 @@
 #endif
 
 #include <signal.h>
+
+#include "pppoe.h"
 
 #ifdef PLUGIN
 #include "pppd/pppd.h"

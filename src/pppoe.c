@@ -15,7 +15,6 @@
 ***********************************************************************/
 
 #define _GNU_SOURCE 1
-#include "pppoe.h"
 
 #include <syslog.h>
 #include <getopt.h>
@@ -38,6 +37,8 @@
 #include <pty.h>
 #endif
 #endif
+
+#include "pppoe.h"
 
 /* Default interface if no -I option given */
 #define DEFAULT_IF "eth0"

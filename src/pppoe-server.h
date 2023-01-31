@@ -16,8 +16,15 @@
 *
 ***********************************************************************/
 
-#include "pppoe.h"
+#include "config.h"
 #include "event.h"
+#include "pppoe.h"
+
+#if defined(HAVE_LINUX_IF_H)
+#include <linux/if.h>
+#elif defined(HAVE_NET_IF_H)
+#include <net/if.h>
+#endif
 
 #define MAX_USERNAME_LEN 31
 /* An Ethernet interface */

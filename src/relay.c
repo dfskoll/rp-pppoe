@@ -19,11 +19,6 @@
 #include "config.h"
 
 #include <sys/socket.h>
-#if defined(HAVE_LINUX_IF_H)
-#include <linux/if.h>
-#elif defined(HAVE_NET_IF_H)
-#include <net/if.h>
-#endif
 #include <signal.h>
 #include "relay.h"
 
@@ -51,6 +46,11 @@
 #include <unistd.h>
 #endif
 
+#if defined(HAVE_LINUX_IF_H)
+#include <linux/if.h>
+#elif defined(HAVE_NET_IF_H)
+#include <net/if.h>
+#endif
 
 /* Interfaces (max MAX_INTERFACES) */
 PPPoEInterface Interfaces[MAX_INTERFACES];

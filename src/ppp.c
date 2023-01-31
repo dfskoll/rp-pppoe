@@ -16,7 +16,7 @@
 *
 ***********************************************************************/
 
-#include "pppoe.h"
+#include "config.h"
 
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
@@ -39,6 +39,8 @@
 #include <pty.h>
 #endif
 #endif
+
+#include "pppoe.h"
 
 static int PPPState;
 static int PPPPacketSize;

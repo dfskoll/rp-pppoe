@@ -16,11 +16,7 @@
 *
 ***********************************************************************/
 
-#include "pppoe.h"
-#include <linux/if.h>
-
 #include <unistd.h>
-#include <linux/if_packet.h>
 
 #include <net/ethernet.h>
 
@@ -35,6 +31,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <net/if_arp.h>
+
+#include "pppoe.h"
+#include <linux/if.h>
+#include <linux/if_packet.h>
 
 /* Initialize frame types to RFC 2516 values.  Some broken peers apparently
    use different frame types... sigh... */

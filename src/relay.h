@@ -16,7 +16,14 @@
 *
 ***********************************************************************/
 
+#include "config.h"
 #include "pppoe.h"
+
+#if defined(HAVE_LINUX_IF_H)
+#include <linux/if.h>
+#elif defined(HAVE_NET_IF_H)
+#include <net/if.h>
+#endif
 
 /* Description for each active Ethernet interface */
 typedef struct InterfaceStruct {

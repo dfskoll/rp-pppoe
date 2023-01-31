@@ -26,8 +26,6 @@
 ***********************************************************************/
 
 #define _GNU_SOURCE 1
-#include "pppoe.h"
-
 #include "pppd/pppd.h"
 #include "pppd/fsm.h"
 #include "pppd/lcp.h"
@@ -35,16 +33,10 @@
 #include "pppd/ccp.h"
 /* #include "pppd/pathnames.h" */
 
-#include <linux/types.h>
 #include <syslog.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#if defined(HAVE_LINUX_IF_H)
-#include <linux/if.h>
-#elif defined(HAVE_NET_IF_H)
-#include <net/if.h>
-#endif
 #include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
@@ -54,8 +46,11 @@
 #include <signal.h>
 #include <net/ethernet.h>
 #include <net/if_arp.h>
+
+#include "pppoe.h"
 #include <linux/ppp_defs.h>
 #include <linux/if_pppox.h>
+#include <linux/types.h>
 
 #ifndef _ROOT_PATH
 #define _ROOT_PATH ""

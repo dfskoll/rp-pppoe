@@ -19,7 +19,6 @@
 #define _GNU_SOURCE
 
 #include "control_socket.h"
-#include "pppoe.h"
 #include "event_tcp.h"
 
 #include <stdio.h>
@@ -34,6 +33,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdbool.h>
+#include "pppoe.h"
 
 #define MAX_CMD_LEN	2048
 

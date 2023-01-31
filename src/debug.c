@@ -16,7 +16,7 @@
 *
 ***********************************************************************/
 
-#include "pppoe.h"
+#include "config.h"
 
 #ifdef DEBUGGING_ENABLED
 
@@ -24,6 +24,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
+#include "pppoe.h"
 
 /**********************************************************************
 *%FUNCTION: dumpHex
