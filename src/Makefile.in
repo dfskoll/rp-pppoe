@@ -80,6 +80,9 @@ discovery.o: discovery.c pppoe.h
 ppp.o: ppp.c pppoe.h
 	@CC@ $(CFLAGS) '-DRP_VERSION="$(RP_VERSION)"' -c -o $@ $<
 
+control-socket.o: control-socket.c control_socket.h event_tcp.h pppoe.h
+	@CC@ $(CFLAGS) '-DRP_VERSION="$(RP_VERSION)"' -c -o $@ $<
+
 md5.o: md5.c md5.h
 	@CC@ $(CFLAGS) '-DRP_VERSION="$(RP_VERSION)"' -c -o $@ $<
 
