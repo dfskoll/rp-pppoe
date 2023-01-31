@@ -821,22 +821,39 @@ processPADT(Interface *ethif, PPPoEPacket *packet, int len)
 
     /* If source MAC does not match, do not kill session */
     if (memcmp(packet->ethHdr.h_source, Sessions[i].eth, ETH_ALEN)) {
-	syslog(LOG_WARNING, "PADT for session %u received from "
-	       "%02X:%02X:%02X:%02X:%02X:%02X; should be from "
-	       "%02X:%02X:%02X:%02X:%02X:%02X",
-	       (unsigned int) ntohs(packet->session),
-	       packet->ethHdr.h_source[0],
-	       packet->ethHdr.h_source[1],
-	       packet->ethHdr.h_source[2],
-	       packet->ethHdr.h_source[3],
-	       packet->ethHdr.h_source[4],
-	       packet->ethHdr.h_source[5],
-	       Sessions[i].eth[0],
-	       Sessions[i].eth[1],
-	       Sessions[i].eth[2],
-	       Sessions[i].eth[3],
-	       Sessions[i].eth[4],
-	       Sessions[i].eth[5]);
+        if (!Sessions[i].eth[0] &&
+            !Sessions[i].eth[1] &&
+            !Sessions[i].eth[2] &&
+            !Sessions[i].eth[3] &&
+            !Sessions[i].eth[4] &&
+            !Sessions[i].eth[5]) {
+            syslog(LOG_INFO, "PADT for closed session %u received from "
+                   "%02X:%02X:%02X:%02X:%02X:%02X",
+                   (unsigned int) ntohs(packet->session),
+                   packet->ethHdr.h_source[0],
+                   packet->ethHdr.h_source[1],
+                   packet->ethHdr.h_source[2],
+                   packet->ethHdr.h_source[3],
+                   packet->ethHdr.h_source[4],
+                   packet->ethHdr.h_source[5]);
+        } else {
+            syslog(LOG_WARNING, "PADT for session %u received from "
+                   "%02X:%02X:%02X:%02X:%02X:%02X; should be from "
+                   "%02X:%02X:%02X:%02X:%02X:%02X",
+                   (unsigned int) ntohs(packet->session),
+                   packet->ethHdr.h_source[0],
+                   packet->ethHdr.h_source[1],
+                   packet->ethHdr.h_source[2],
+                   packet->ethHdr.h_source[3],
+                   packet->ethHdr.h_source[4],
+                   packet->ethHdr.h_source[5],
+                   Sessions[i].eth[0],
+                   Sessions[i].eth[1],
+                   Sessions[i].eth[2],
+                   Sessions[i].eth[3],
+                   Sessions[i].eth[4],
+                   Sessions[i].eth[5]);
+        }
 	return;
     }
     Sessions[i].flags |= FLAG_RECVD_PADT;
