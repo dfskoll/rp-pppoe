@@ -59,6 +59,8 @@ fi
 
 AC_ARG_ENABLE(plugin, [  --enable-plugin=pppd_src_path   build pppd plugin], ac_cv_pluginpath=$enableval, ac_cv_pluginpath=no)
 AC_ARG_ENABLE(debugging, [  --disable-debugging             disable debugging code], ac_cv_debugging=$enableval, ac_cv_debugging=yes)
+AC_ARG_ENABLE(static, [  --enable-static                 Build static executables], ac_cv_static=$enableval, ac_cv_static=no)
+
 dnl If we were given "--enable-plugin" without a path, take a stab at where
 dnl the pppd source code might be.
 
@@ -200,12 +202,19 @@ EXTRACONFIGS=""
 
 RDYNAMIC=""
 
+if test "$ac_cv_static" = "yes" ; then
+   STATIC=-static
+else
+   STATIC=""
+fi
+
 LIBEVENT=../libevent
 AC_SUBST(TARGETS)
 AC_SUBST(PPPOE_SERVER_DEPS)
 AC_SUBST(RDYNAMIC)
 AC_SUBST(LIBEVENT)
 AC_SUBST(LDFLAGS)
+AC_SUBST(STATIC)
 
 datadir_evaluated=`eval echo $datadir`
 AC_SUBST(datadir_evaluated)

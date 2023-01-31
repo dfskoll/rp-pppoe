@@ -622,6 +622,7 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 datadir_evaluated
+STATIC
 LIBEVENT
 RDYNAMIC
 PPPOE_SERVER_DEPS
@@ -695,6 +696,7 @@ ac_user_opts='
 enable_option_checking
 enable_plugin
 enable_debugging
+enable_static
 enable_licenses
 '
       ac_precious_vars='build_alias
@@ -1326,6 +1328,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-plugin=pppd_src_path   build pppd plugin
   --disable-debugging             disable debugging code
+  --enable-static                 Build static executables
   --enable-licenses=lic_path      build commercial version
 
 Some influential environment variables:
@@ -3840,6 +3843,14 @@ else
   ac_cv_debugging=yes
 fi
 
+# Check whether --enable-static was given.
+if test "${enable_static+set}" = set; then :
+  enableval=$enable_static; ac_cv_static=$enableval
+else
+  ac_cv_static=no
+fi
+
+
 
 if test "$ac_cv_pluginpath" = "yes" ; then
     for i in /usr/include /usr/local/include `echo $CPATH | sed -e 's/:/ /g'`; do
@@ -4358,7 +4369,14 @@ EXTRACONFIGS=""
 
 RDYNAMIC=""
 
+if test "$ac_cv_static" = "yes" ; then
+   STATIC=-static
+else
+   STATIC=""
+fi
+
 LIBEVENT=../libevent
+
 
 
 
