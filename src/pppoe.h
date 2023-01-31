@@ -28,7 +28,7 @@ extern int IsSetID;
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <linux/if_ether.h>
+#include <net/ethernet.h>
 
 /* Ethernet frame types according to RFC 2516 */
 #define ETH_PPPOE_DISCOVERY 0x8863
