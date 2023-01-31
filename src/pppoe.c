@@ -90,6 +90,71 @@ sendSessionPacket(PPPoEConnection *conn, PPPoEPacket *packet, int len)
 }
 
 /**********************************************************************
+*%FUNCTION: sessionDiscoveryPacket
+*%ARGUMENTS:
+* conn -- PPPoE connection
+*%RETURNS:
+* Nothing
+*%DESCRIPTION:
+* We got a discovery packet during the session stage.  This most likely
+* means a PADT.
+***********************************************************************/
+static void
+sessionDiscoveryPacket(PPPoEConnection *conn)
+{
+    PPPoEPacket packet;
+    int len;
+
+    if (receivePacket(conn->discoverySocket, &packet, &len) < 0) {
+	return;
+    }
+
+    /* Check length */
+    if (ntohs(packet.length) + HDR_SIZE > len) {
+	syslog(LOG_ERR, "Bogus PPPoE length field (%u)",
+	       (unsigned int) ntohs(packet.length));
+	return;
+    }
+
+    /* Is it for our session? */
+    if (packet.session != conn->session) {
+	/* Nope, ignore it */
+	return;
+    }
+
+    /* Is it for our Ethernet interface? */
+    if (memcmp(packet.ethHdr.h_dest, conn->myEth, ETH_ALEN)) {
+	/* Nope, ignore it */
+	return;
+    }
+
+    /* Is it from our peer's Ethernet interface? */
+    if (memcmp(packet.ethHdr.h_source, conn->peerEth, ETH_ALEN)) {
+	/* Nope, ignore it */
+	return;
+    }
+
+    if (packet.code != CODE_PADT) {
+	/* Not PADT; ignore it */
+	return;
+    }
+
+#ifdef DEBUGGING_ENABLED
+    if (conn->debugFile) {
+	dumpPacket(conn->debugFile, &packet, "RCVD");
+	fprintf(conn->debugFile, "\n");
+	fflush(conn->debugFile);
+    }
+#endif
+    syslog(LOG_INFO,
+	   "Session %d terminated -- received PADT from peer",
+	   (int) ntohs(packet.session));
+    parsePacket(&packet, parseLogErrs, NULL);
+    sendPADT(conn, "Received PADT from peer");
+    exit(EXIT_SUCCESS);
+}
+
+/**********************************************************************
 *%FUNCTION: session
 *%ARGUMENTS:
 * conn -- PPPoE connection info
@@ -166,6 +231,11 @@ session(PPPoEConnection *conn)
                 syncReadFromEth(conn, conn->sessionSocket, optClampMSS);
             } else {
                 asyncReadFromEth(conn, conn->sessionSocket, optClampMSS);
+            }
+        }
+        if (conn->discoverySocket >= 0) {
+            if (FD_ISSET(conn->discoverySocket, &readable)) {
+                sessionDiscoveryPacket(conn);
             }
         }
     }
