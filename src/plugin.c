@@ -49,6 +49,10 @@
 
 #include "pppoe.h"
 #include <linux/ppp_defs.h>
+/* Needed on ancient Linux systems... */
+#ifndef IFNAMSIZ
+#include <net/if.h>
+#endif
 #include <linux/if_pppox.h>
 #include <linux/types.h>
 
