@@ -575,9 +575,6 @@ main(int argc, char *argv[])
         conn.discoverySocket =
 	    openInterface(conn.ifName, Eth_PPPOE_Discovery, conn.myEth, NULL);
         discovery(&conn);
-        if (conn.printACNames) {
-            exit(0);
-        }
     }
     if (optSkipSession) {
 	printf("%u:%02x:%02x:%02x:%02x:%02x:%02x\n",

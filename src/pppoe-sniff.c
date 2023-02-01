@@ -76,7 +76,7 @@ void
 fatalSys(char const *str)
 {
     printErr("%.256s: %.256s", str, strerror(errno));
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 /**********************************************************************
@@ -92,7 +92,7 @@ void
 rp_fatal(char const *str)
 {
     printErr("%s", str);
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 /**********************************************************************
@@ -118,7 +118,7 @@ usage(char const *argv0)
     fprintf(stderr, "This is free software, and you are welcome to redistribute it under the terms\n");
     fprintf(stderr, "of the GNU General Public License, version 2 or any later version.\n");
     fprintf(stderr, "https://dianne.skoll.ca/projects/rp-pppoe/\n");
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 /**********************************************************************
@@ -141,7 +141,7 @@ main(int argc, char *argv[])
     if (getuid() != geteuid() ||
 	getgid() != getegid()) {
 	fprintf(stderr, "SECURITY WARNING: pppoe-sniff will NOT run suid or sgid.  Fix your installation.\n");
-	exit(1);
+	exit(EXIT_FAILURE);
     }
 
     while((opt = getopt(argc, argv, "I:V")) != -1) {
@@ -151,7 +151,7 @@ main(int argc, char *argv[])
 	    break;
 	case 'V':
 	    printf("pppoe-sniff: RP-PPPoE Version %s\n", RP_VERSION);
-	    exit(0);
+	    exit(EXIT_SUCCESS);
 	default:
 	    usage(argv[0]);
 	}

@@ -373,7 +373,7 @@ parseAddressPool(char const *fname, int install)
 
     if (!fp) {
 	sysErr("Cannot open address pool file");
-	exit(1);
+	exit(EXIT_FAILURE);
     }
 
     while (!feof(fp)) {
@@ -1121,7 +1121,7 @@ static __attribute__((noreturn)) void
 pppoe_terminate(void)
 {
     killAllSessions();
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 /**********************************************************************
@@ -1232,7 +1232,7 @@ main(int argc, char **argv)
     if (getuid() != geteuid() ||
 	getgid() != getegid()) {
 	fprintf(stderr, "SECURITY WARNING: pppoe-server will NOT run suid or sgid.  Fix your installation.\n");
-	exit(1);
+	exit(EXIT_FAILURE);
     }
 
     /* Initialize syslog */
@@ -1242,7 +1242,7 @@ main(int argc, char **argv)
     interfaces = malloc(sizeof(*interfaces) * INIT_INTERFACES);
     if (!interfaces) {
 	fprintf(stderr, "Out of memory allocating initial interfaces.\n");
-	exit(1);
+	exit(EXIT_FAILURE);
     }
 
     /* Default number of session slots */
@@ -1275,7 +1275,7 @@ main(int argc, char **argv)
 	    if (NumServiceNames == MAX_SERVICE_NAMES) {
 		fprintf(stderr, "Too many '-S' options (%d max)",
 			MAX_SERVICE_NAMES);
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 
             /* Service names can only be [-_.A-Za-z0-9/] for shell-escaping
@@ -1283,14 +1283,14 @@ main(int argc, char **argv)
             for (s=optarg; *s; s++) {
                 if (!strchr("-_.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/", *s)) {
                     fprintf(stderr, "Illegal character `%c' in service-name: Must be A-Z, a-z, 0-9 or one of ./-_\n", *s);
-                    exit(1);
+                    exit(EXIT_FAILURE);
                 }
             }
 
 	    ServiceNames[NumServiceNames] = strdup(optarg);
 	    if (!ServiceNames[NumServiceNames]) {
 		fprintf(stderr, "Out of memory");
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 	    NumServiceNames++;
 	    break;
@@ -1298,14 +1298,14 @@ main(int argc, char **argv)
 	    pppd_path = strdup(optarg);
 	    if (!pppd_path) {
 		fprintf(stderr, "Out of memory");
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 	    break;
 	case 'Q':
 	    pppoe_path = strdup(optarg);
 	    if (!pppoe_path) {
 		fprintf(stderr, "Out of memory");
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 	    break;
 
@@ -1317,7 +1317,7 @@ main(int argc, char **argv)
 	    motd_string = strdup(optarg);
 	    if (!motd_string) {
 		fprintf(stderr, "Out of memory");
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 	    break;
 
@@ -1329,7 +1329,7 @@ main(int argc, char **argv)
 	    hurl_string = strdup(optarg);
 	    if (!hurl_string) {
 		fprintf(stderr, "Out of memory");
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 	    break;
 	case 'd':
@@ -1504,7 +1504,7 @@ main(int argc, char **argv)
 	NumSessionSlots = parseAddressPool(addressPoolFname, 0);
 	if (CheckPoolSyntax) {
 	    printf("%lu\n", (unsigned long) NumSessionSlots);
-	    exit(0);
+	    exit(EXIT_SUCCESS);
 	}
     }
 
@@ -1614,7 +1614,7 @@ main(int argc, char **argv)
 		   ses->peerip[2], ses->peerip[3]);
 	    ses = ses->next;
 	}
-	exit(0);
+	exit(EXIT_SUCCESS);
     }
 
     /* Open all the interfaces */
@@ -1733,23 +1733,23 @@ main(int argc, char **argv)
 	if (LockFD < 0) {
 	    syslog(LOG_INFO, "Could not open PID file %s: %s", pidfile, strerror(errno));
 	    if (foo) fprintf(foo, "ECould not open PID file %s: %s\n", pidfile, strerror(errno));
-	    exit(1);
+	    exit(EXIT_FAILURE);
 	}
 	if (fcntl(LockFD, F_SETLK, &fl) < 0) {
 	    syslog(LOG_INFO, "Could not lock PID file %s: Is another process running?", pidfile);
 	    if (foo) fprintf(foo, "ECould not lock PID file %s: Is another process running?\n", pidfile);
-	    exit(1);
+	    exit(EXIT_FAILURE);
 	}
 	if (ftruncate(LockFD, 0) < 0) {
 	    syslog(LOG_INFO, "Could not truncate PID file %s: %s", pidfile, strerror(errno));
 	    if (foo) fprintf(foo, "ECould not truncate PID file %s: %s", pidfile, strerror(errno));
-	    exit(1);
+	    exit(EXIT_FAILURE);
         }
 	snprintf(buf, sizeof(buf), "%lu\n", (unsigned long) getpid());
 	if (write(LockFD, buf, strlen(buf)) < strlen(buf)) {
 	    syslog(LOG_INFO, "Could not write PID file %s: %s", pidfile, strerror(errno));
 	    if (foo) fprintf(foo, "ECould not write PID file %s: %s", pidfile, strerror(errno));
-	    exit(1);
+	    exit(EXIT_FAILURE);
 	}
 
 	/* Do not close fd... use it to retain lock */

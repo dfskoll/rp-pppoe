@@ -221,7 +221,7 @@ parsePADOTags(uint16_t type, uint16_t len, unsigned char *data,
 	    pktLogErrs("PADO", type, len, data, extra);
 	    pc->gotError = 1;
 	    if (!persist) {
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 	}
 	break;
@@ -232,7 +232,7 @@ parsePADOTags(uint16_t type, uint16_t len, unsigned char *data,
 	    pktLogErrs("PADO", type, len, data, extra);
 	    pc->gotError = 1;
 	    if (!persist) {
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 	}
 	break;
@@ -243,7 +243,7 @@ parsePADOTags(uint16_t type, uint16_t len, unsigned char *data,
 	    pktLogErrs("PADO", type, len, data, extra);
 	    pc->gotError = 1;
 	    if (!persist) {
-		exit(1);
+		exit(EXIT_FAILURE);
 	    }
 	}
 	break;
@@ -494,6 +494,10 @@ waitForPADO(PPPoEConnection *conn, int timeout)
 	    pc.seenServiceName = 0;
 	    pc.acNameOK      = (conn->acName)      ? 0 : 1;
 	    pc.serviceNameOK = (conn->serviceName) ? 0 : 1;
+
+            if (conn->printACNames && (conn->numPADOs > 0)) {
+                printf("\n");
+            }
 	    parsePacket(&packet, parsePADOTags, &pc);
 	    if (pc.gotError) {
 		printErr("Error in PADO packet");
@@ -519,7 +523,6 @@ waitForPADO(PPPoEConnection *conn, int timeout)
 			   (unsigned) conn->peerEth[3],
 			   (unsigned) conn->peerEth[4],
 			   (unsigned) conn->peerEth[5]);
-		    printf("--------------------------------------------------\n");
 		    continue;
 		}
 		conn->discoveryState = STATE_RECEIVED_PADO;
@@ -740,7 +743,7 @@ discovery(PPPoEConnection *conn)
 	conn->discoveryState = STATE_SESSION;
 	if (conn->killSession) {
 	    sendPADT(conn, "RP-PPPoE: Session killed manually");
-	    exit(0);
+	    exit(EXIT_SUCCESS);
 	}
 	return;
     }
@@ -755,7 +758,7 @@ discovery(PPPoEConnection *conn)
 		padiAttempts = 0;
 		timeout = conn->discoveryTimeout;
 	    } else {
-		return;
+                break;
 	    }
 	}
 	sendPADI(conn);
@@ -775,7 +778,11 @@ discovery(PPPoEConnection *conn)
 
     /* If we're only printing access concentrator names, we're done */
     if (conn->printACNames) {
-	exit(0);
+        if (conn->numPADOs) {
+            exit(EXIT_SUCCESS);
+        } else {
+            exit(EXIT_FAILURE);
+        }
     }
 
     timeout = conn->discoveryTimeout;

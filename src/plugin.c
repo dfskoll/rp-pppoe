@@ -493,7 +493,7 @@ fatalSys(char const *str)
     printErr("%.256s: %.256s", str, strerror(i));
     sprintf(buf, "RP-PPPoE: %.256s: %.256s", str, strerror(i));
     sendPADT(conn, buf);
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 /**********************************************************************
@@ -510,7 +510,7 @@ rp_fatal(char const *str)
 {
     printErr("%s", str);
     sendPADTf(conn, "RP-PPPoE: %.256s", str);
-    exit(1);
+    exit(EXIT_FAILURE);
 }
 
 /**********************************************************************

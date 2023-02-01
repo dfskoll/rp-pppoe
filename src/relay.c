@@ -245,7 +245,7 @@ main(int argc, char *argv[])
     if (getuid() != geteuid() ||
 	getgid() != getegid()) {
 	fprintf(stderr, "SECURITY WARNING: pppoe-relay will NOT run suid or sgid.  Fix your installation.\n");
-	exit(1);
+	exit(EXIT_FAILURE);
     }
 
 
@@ -329,7 +329,7 @@ main(int argc, char *argv[])
 	    fatalSys("fork");
 	} else if (i != 0) {
 	    /* parent */
-	    exit(0);
+	    exit(EXIT_SUCCESS);
 	}
 	setsid();
 	signal(SIGHUP, SIG_IGN);
@@ -337,7 +337,7 @@ main(int argc, char *argv[])
 	if (i < 0) {
 	    fatalSys("fork");
 	} else if (i != 0) {
-	    exit(0);
+	    exit(EXIT_SUCCESS);
 	}
 
 	if (chdir("/") < 0) {

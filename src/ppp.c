@@ -124,7 +124,7 @@ syncReadFromPPP(PPPoEConnection *conn, PPPoEPacket *packet)
     if (r == 0) {
 	syslog(LOG_INFO, "end-of-file in syncReadFromPPP");
 	sendPADT(conn, "RP-PPPoE: EOF in syncReadFromPPP");
-	exit(0);
+	exit(EXIT_SUCCESS);
     }
 
     if (r < 2) {
@@ -178,7 +178,7 @@ asyncReadFromPPP(PPPoEConnection *conn, PPPoEPacket *packet)
     if (r == 0) {
 	syslog(LOG_INFO, "end-of-file in asyncReadFromPPP");
 	sendPADT(conn, "RP-PPPoE: EOF in asyncReadFromPPP");
-	exit(0);
+	exit(EXIT_SUCCESS);
     }
 
     while(r) {
