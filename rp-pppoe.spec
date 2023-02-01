@@ -1,6 +1,6 @@
 Summary: PPP Over Ethernet (xDSL support)
 Name: rp-pppoe
-Version: 3.15
+Version: 3.16
 %if %(%{expand:test %{_vendor} != mandrake ; echo $?})
 Release: 1mdk
 %else
@@ -8,7 +8,7 @@ Release: 1
 %endif
 License: GPL
 Group: System Environment/Daemons
-Source: https://dianne.skoll.ca/projects/rp-pppoe/download/rp-pppoe-3.15.tar.gz
+Source: https://dianne.skoll.ca/projects/rp-pppoe/download/rp-pppoe-3.16.tar.gz
 Url: https://dianne.skoll.ca/projects/rp-pppoe/
 Packager: Dianne Skoll <dianne@skoll.ca>
 BuildRoot: /tmp/pppoe-build
