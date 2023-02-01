@@ -15,31 +15,20 @@
 
 #include "config.h"
 
-#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-#endif
-
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-
-#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif
 #include <time.h>
 
 #ifdef HAVE_SYS_UIO_H
 #include <sys/uio.h>
 #endif
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
-
-#ifdef USE_LINUX_PACKET
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#endif
 
 #include <signal.h>
 

@@ -22,18 +22,12 @@
 
 #include "config.h"
 
-#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-#endif
-
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 #include <sys/types.h>
 #include <pwd.h>
@@ -644,9 +638,8 @@ parseLogErrs(uint16_t type, uint16_t len, unsigned char *data,
     pktLogErrs("PADT", type, len, data, extra);
 }
 
-#ifndef HAVE_STRLCPY
 /**********************************************************************
-*%FUNCTION: strlcpy
+*%FUNCTION: rp_strlcpy
 *%ARGUMENTS:
 * dst -- destination buffer
 * src -- source string
@@ -658,7 +651,7 @@ parseLogErrs(uint16_t type, uint16_t len, unsigned char *data,
 * always NUL-terminating dst if size!=0.
 ***********************************************************************/
 size_t
-strlcpy(char *dst, const char *src, size_t size)
+rp_strlcpy(char *dst, const char *src, size_t size)
 {
     const char *orig_src = src;
 
@@ -678,4 +671,3 @@ strlcpy(char *dst, const char *src, size_t size)
 
     return src - orig_src - 1;
 }
-#endif

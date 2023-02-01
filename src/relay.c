@@ -22,34 +22,21 @@
 #include <signal.h>
 #include "relay.h"
 
-#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-#endif
-
-#ifdef HAVE_GETOPT_H
 #include <getopt.h>
-#endif
-
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
-#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif
 
 #ifdef HAVE_SYS_UIO_H
 #include <sys/uio.h>
 #endif
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 #if defined(HAVE_LINUX_IF_H)
 #include <linux/if.h>
-#elif defined(HAVE_NET_IF_H)
-#include <net/if.h>
 #endif
 
 /* Interfaces (max MAX_INTERFACES) */
@@ -290,13 +277,6 @@ main(int argc, char *argv[])
 	    usage(argv[0]);
 	}
     }
-
-#ifdef USE_LINUX_PACKET
-#ifndef HAVE_STRUCT_SOCKADDR_LL
-    fprintf(stderr, "The PPPoE relay does not work on Linux 2.0 kernels.\n");
-    exit(EXIT_FAILURE);
-#endif
-#endif
 
     /* Check that at least two interfaces were defined */
     if (NumInterfaces < 2) {

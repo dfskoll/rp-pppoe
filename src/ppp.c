@@ -18,10 +18,7 @@
 
 #include "config.h"
 
-#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-#endif
-
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -30,9 +27,7 @@
 #include <sys/uio.h>
 #endif
 
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 #ifdef HAVE_N_HDLC
 #ifndef N_HDLC

@@ -24,31 +24,16 @@
 #define _POSIX_SOURCE 1 /* For sigaction defines */
 #endif
 
-#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
-#endif
-
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/file.h>
-
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
-
-#ifdef HAVE_GETOPT_H
 #include <getopt.h>
-#endif
-
-#ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#endif
-
-#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#endif
 
 #include <time.h>
 #include <signal.h>
@@ -61,8 +46,6 @@
 
 #if defined(HAVE_LINUX_IF_H)
 #include <linux/if.h>
-#elif defined(HAVE_NET_IF_H)
-#include <net/if.h>
 #endif
 
 static void InterfaceHandler(EventSelector *es,
@@ -1479,13 +1462,6 @@ main(int argc, char **argv)
     if (!pppoptfile) {
 	pppoptfile = PPPOE_SERVER_OPTIONS;
     }
-
-#ifdef USE_LINUX_PACKET
-#ifndef HAVE_STRUCT_SOCKADDR_LL
-    fprintf(stderr, "The PPPoE server does not work on Linux 2.0 kernels.\n");
-    exit(EXIT_FAILURE);
-#endif
-#endif
 
     if (!NumInterfaces) {
 	strcpy(interfaces[0].name, DEFAULT_IF);

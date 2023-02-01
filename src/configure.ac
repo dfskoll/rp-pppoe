@@ -19,7 +19,7 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(fcntl.h sys/ioctl.h sys/time.h syslog.h unistd.h net/if_arp.h netinet/if_ether.h getopt.h sys/uio.h sys/param.h fcntl.h netpacket/packet.h net/ethernet.h asm/types.h linux/if_packet.h linux/if_ether.h sys/socket.h net/if.h net/if_dl.h net/if_ether.h net/if_types.h netinet/if_ether.h net/if_types.h net/if_dl.h)
+AC_CHECK_HEADERS(net/if_arp.h sys/uio.h net/ethernet.h linux/if_packet.h)
 AC_CHECK_HEADERS(linux/if.h, [], [], [#include<sys/socket.h>])
 AC_CHECK_HEADERS(linux/if_pppox.h, [], [],
 [
@@ -28,12 +28,6 @@ AC_CHECK_HEADERS(linux/if_pppox.h, [], [],
 #include <net/if.h>
 #include <netinet/in.h>
 ])
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_PID_T
-
-AC_STRUCT_TM
 
 dnl Check for sockaddr_ll
 AC_MSG_CHECKING(for struct sockaddr_ll)

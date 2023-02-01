@@ -163,7 +163,7 @@ PPPOEConnectDevice(void)
 	error("Can't get MTU for %s: %m", conn->ifName);
 	return -1;
     }
-    strlcpy(ifr.ifr_name, conn->ifName, sizeof(ifr.ifr_name));
+    rp_strlcpy(ifr.ifr_name, conn->ifName, sizeof(ifr.ifr_name));
     if (ioctl(s, SIOCGIFMTU, &ifr) < 0) {
 	error("Can't get MTU for %s: %m", conn->ifName);
 	close(s);
@@ -196,7 +196,7 @@ PPPOEConnectDevice(void)
 	SET_STRING(conn->serviceName, pppd_pppoe_service);
     }
 
-    strlcpy(ppp_devnam, devnam, sizeof(ppp_devnam));
+    rp_strlcpy(ppp_devnam, devnam, sizeof(ppp_devnam));
     if (existingSession) {
 	unsigned int mac[ETH_ALEN];
 	int i, ses;
@@ -278,7 +278,7 @@ PPPOESendConfig(int mtu,
 	warn("Couldn't create IP socket: %m");
 	return;
     }
-    strlcpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
+    rp_strlcpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
     ifr.ifr_mtu = mtu;
     if (ioctl(sock, SIOCSIFMTU, &ifr) < 0) {
 	warn("ioctl(SIOCSIFMTU): %m");
@@ -337,7 +337,7 @@ static void
 PPPOEDeviceOptions(void)
 {
     char buf[MAXPATHLEN];
-    strlcpy(buf, _PATH_ETHOPT, MAXPATHLEN);
+    rp_strlcpy(buf, _PATH_ETHOPT, MAXPATHLEN);
     strlcat(buf, devnam, MAXPATHLEN);
 
     if(!options_from_file(buf, 0, 0, 1))
@@ -398,7 +398,7 @@ PPPoEDevnameHook(char *cmd, char **argv, int doit)
 
     /* Try getting interface index */
     if (r) {
-	strlcpy(ifr.ifr_name, cmd, IFNAMSIZ);
+	rp_strlcpy(ifr.ifr_name, cmd, IFNAMSIZ);
 	if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
 	    r = 0;
 	} else {
@@ -419,7 +419,7 @@ PPPoEDevnameHook(char *cmd, char **argv, int doit)
     if (r) {
 	seen_devnam[seen_idx] = 1;
 	if (doit) {
-	    strlcpy(devnam, cmd, sizeof(devnam));
+	    rp_strlcpy(devnam, cmd, sizeof(devnam));
 	    if (the_channel != &pppoe_channel) {
 
 		the_channel = &pppoe_channel;

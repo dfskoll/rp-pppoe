@@ -229,9 +229,7 @@ void discovery(PPPoEConnection *conn);
 unsigned char *findTag(PPPoEPacket *packet, uint16_t tagType,
 		       PPPoETag *tag);
 
-#ifndef HAVE_STRLCPY
-size_t strlcpy(char *dst, const char *src, size_t size);
-#endif
+size_t rp_strlcpy(char *dst, const char *src, size_t size);
 
 #define SET_STRING(var, val) do { if (var) free(var); var = strdup(val); if (!var) rp_fatal("strdup failed"); } while(0);
 

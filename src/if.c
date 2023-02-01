@@ -20,10 +20,6 @@
 
 #include <net/ethernet.h>
 
-#ifdef HAVE_ASM_TYPES_H
-#include <asm/types.h>
-#endif
-
 #include <sys/ioctl.h>
 #include <syslog.h>
 
@@ -117,7 +113,7 @@ openInterface(char const *ifname, uint16_t type, unsigned char *hwaddr, uint16_t
 
     /* Fill in hardware address */
     if (hwaddr) {
-	strlcpy(ifr.ifr_name, ifname, IFNAMSIZ);
+	rp_strlcpy(ifr.ifr_name, ifname, IFNAMSIZ);
 	if (ioctl(fd, SIOCGIFHWADDR, &ifr) < 0) {
 	    fatalSys("ioctl(SIOCGIFHWADDR)");
 	}
@@ -139,7 +135,7 @@ openInterface(char const *ifname, uint16_t type, unsigned char *hwaddr, uint16_t
     }
 
     /* Sanity check on MTU */
-    strlcpy(ifr.ifr_name, ifname, IFNAMSIZ);
+    rp_strlcpy(ifr.ifr_name, ifname, IFNAMSIZ);
     if (ioctl(fd, SIOCGIFMTU, &ifr) < 0) {
 	fatalSys("ioctl(SIOCGIFMTU)");
     }
@@ -154,7 +150,7 @@ openInterface(char const *ifname, uint16_t type, unsigned char *hwaddr, uint16_t
     sa.sll_family = AF_PACKET;
     sa.sll_protocol = htons(type);
 
-    strlcpy(ifr.ifr_name, ifname, IFNAMSIZ);
+    rp_strlcpy(ifr.ifr_name, ifname, IFNAMSIZ);
     if (ioctl(fd, SIOCGIFINDEX, &ifr) < 0) {
 	fatalSys("ioctl(SIOCFIGINDEX): Could not get interface index");
     }
