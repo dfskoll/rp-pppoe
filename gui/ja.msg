@@ -1,4 +1,4 @@
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 ::msgcat::mcset ja "AC-Name:" "AC-Name:"
 ::msgcat::mcset ja "Advanced" "高度な設定"

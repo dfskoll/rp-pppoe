@@ -1,7 +1,7 @@
 #ifndef MD5_H
 #define MD5_H
 /*
- * LIC: GPL
+ * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
 #include "config.h"

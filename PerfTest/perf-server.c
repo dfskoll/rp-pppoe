@@ -7,7 +7,7 @@
 * Copyright (C) 2001 by Roaring Penguin Software Inc.
 * Copyright (C) 2018 Dianne Skoll
 *
-* LIC: GPL
+* SPDX-License-Identifier: GPL-2.0-or-later
 ***********************************************************************/
 
 #define _POSIX_SOURCE 1 /* For sigaction defines */

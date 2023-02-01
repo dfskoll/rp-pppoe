@@ -15,7 +15,7 @@ BuildRoot: /tmp/pppoe-build
 Vendor: Dianne Skoll
 Requires: ppp >= 2.3.7
 
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 %description
 PPPoE (Point-to-Point Protocol over Ethernet) is a protocol used by
 many DSL Internet Service Providers. RP-PPPoE is a free

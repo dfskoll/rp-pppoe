@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-dnl LIC: GPL
+dnl SPDX-License-Identifier: GPL-2.0-or-later
 AC_INIT
 AC_CONFIG_SRCDIR([pppoe.c])
 

@@ -1,5 +1,5 @@
 # Makefile for performance-testing software
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 CC=gcc
 CFLAGS=-O2 -ansi -pedantic -Wall -Wstrict-prototypes

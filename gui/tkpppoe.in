@@ -1,6 +1,6 @@
 #!/bin/sh
 # -*-Mode: TCL;-*-
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 #--------------------------------------------------------------
 #   tkpppoe

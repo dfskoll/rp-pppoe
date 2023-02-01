@@ -9,7 +9,7 @@
 * Copyright (C) 2005 by Roaring Penguin Software Inc.
 * Copyright (C) 2018 Dianne Skoll
 *
-* LIC: GPL
+* SPDX-License-Identifier: GPL-2.0-or-later
 *
 * This program may be distributed under the terms of the GNU General
 * Public License, Version 2, or (at your option) any later version.

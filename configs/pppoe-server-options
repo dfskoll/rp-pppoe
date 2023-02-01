@@ -1,5 +1,5 @@
 # PPP options for the PPPoE server
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 require-pap
 login
 lcp-echo-interval 10

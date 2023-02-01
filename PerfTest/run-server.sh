@@ -1,5 +1,5 @@
 #!/bin/sh
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 # Shell script to run performance-testing SERVER on a Linux machine.
 #
 # Copyright 2001 Roaring Penguin Software Inc.

@@ -13,7 +13,7 @@
 # This file may be distributed under the terms of the GNU General
 # Public License.
 #
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 #
 # Usage: pppoe-status [config_file]
 # If config_file is omitted, defaults to /etc/ppp/pppoe.conf

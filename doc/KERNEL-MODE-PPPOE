@@ -1,4 +1,4 @@
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 RP-PPPoE now supports kernel-mode PPPoE on Linux kernels 2.4 or newer.
 However, the default "./go" build procedure does not make kernel-mode

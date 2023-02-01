@@ -5,7 +5,7 @@
 #
 # All-purpose slicing/dicing shell script to configure rp-pppoe.
 #
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 #
 # Copyright (C) 2000 Roaring Penguin Software Inc.
 # Copyright (C) 2018 Dianne Skoll

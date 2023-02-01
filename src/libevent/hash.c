@@ -11,7 +11,7 @@
 * This software may be distributed under the terms of the GNU General
 * Public License, Version 2 or (at your option) any later version.
 *
-* LIC: GPL
+* SPDX-License-Identifier: GPL-2.0-or-later
 *
 ***********************************************************************/
 

@@ -9,7 +9,7 @@
  * except that you don't need to include two pages of legalese
  * with every copy.
  *
- * LIC: GPL
+ * SPDX-License-Identifier: GPL-2.0-or-later
  *
  * To compute the message digest of a chunk of bytes, declare an
  * MD5Context structure, pass it to MD5Init, call MD5Update as

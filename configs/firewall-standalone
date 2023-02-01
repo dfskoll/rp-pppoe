@@ -6,7 +6,7 @@
 # Copyright (C) 2005 Roaring Penguin Software Inc.  This software may
 # be distributed under the terms of the GNU General Public License, version
 # 2 or any later version.
-# LIC: GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 # Interface to Internet
 EXTIF=ppp+
