@@ -5,7 +5,7 @@
 * Re-usable code for implementing a control socket.
 *
 * Copyright (C) 2000-2012 Roaring Penguin Software Inc.
-* Copyright (C) 2018-2021 Dianne Skoll
+* Copyright (C) 2018-2023 Dianne Skoll
 * Copyright (C) 2022 Jaco Kroon
 *
 * This program may be distributed according to the terms of the GNU

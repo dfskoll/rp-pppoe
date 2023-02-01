@@ -7,7 +7,7 @@
 * Common functions used by PPPoE client and server
 *
 * Copyright (C) 2000-2012 by Roaring Penguin Software Inc.
-* Copyright (C) 2018-2021 Dianne Skoll
+* Copyright (C) 2018-2023 Dianne Skoll
 *
 * This program may be distributed according to the terms of the GNU
 * General Public License, version 2 or (at your option) any later version.

@@ -5,7 +5,7 @@
 * pppd plugin for kernel-mode PPPoE on Linux
 *
 * Copyright (C) 2001-2012 by Roaring Penguin Software Inc.
-* Copyright (C) 2018-2021 Dianne Skoll
+* Copyright (C) 2018-2023 Dianne Skoll
 * Portions copyright 2000 Michal Ostrowski and Jamal Hadi Salim.
 *
 * Much code and many ideas derived from pppoe plugin by Michal

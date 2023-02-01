@@ -5,7 +5,7 @@
 * Test event-handling code.
 *
 * Copyright (C) 2001 by Roaring Penguin Software Inc.
-* Copyright (C) 2018-2021 Dianne Skoll
+* Copyright (C) 2018-2023 Dianne Skoll
 *
 ***********************************************************************/
 

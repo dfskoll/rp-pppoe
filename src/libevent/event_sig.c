@@ -6,7 +6,7 @@
 * with reaping child processes.
 *
 * Copyright (C) 2002 by Roaring Penguin Software Inc.
-* Copyright (C) 2018-2021 Dianne Skoll
+* Copyright (C) 2018-2023 Dianne Skoll
 *
 * This software may be distributed under the terms of the GNU General
 * Public License, Version 2, or (at your option) any later version.

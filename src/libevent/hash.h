@@ -5,7 +5,7 @@
 * Hash table utilities
 *
 * Copyright (C) 2002 Roaring Penguin Software Inc.
-* Copyright (C) 2018-2021 Dianne Skoll
+* Copyright (C) 2018-2023 Dianne Skoll
 *
 * SPDX-License-Identifier: GPL-2.0-or-later
 *
