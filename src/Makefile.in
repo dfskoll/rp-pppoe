@@ -214,7 +214,7 @@ tgz: distro
 distro:
 	rm -rf ../rp-pppoe-$(RP_VERSION)$(BETA)
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)
-	for i in README SERVPOET go go-gui rp-pppoe.spec ; do \
+	for i in README SERVPOET go rp-pppoe.spec ; do \
 		cp ../$$i ../rp-pppoe-$(RP_VERSION)$(BETA) || exit 1; \
 	done
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/gui
