@@ -43,3 +43,4 @@ src/tests/testevent.o
 gui/Makefile
 gui/pppoe-wrapper
 gui/wrapper.o
+gui/tkpppoe
