@@ -1908,6 +1908,7 @@ startPPPD(ClientSession *session)
 
     char buffer[2 * SMALLBUF];
 
+    char *mrumtu;
     int c = 0;
 
     syslog(LOG_INFO,
@@ -1994,14 +1995,19 @@ startPPPD(ClientSession *session)
     if (PassUnitOptionToPPPD) {
 	argv[c++] = "unit";
 	sprintf(buffer, "%u", (unsigned int) (ntohs(session->sess) - 1 - SessOffset));
-	argv[c++] = buffer;
+	if (!(argv[c++] = strdup(buffer))) {
+            exit(EXIT_FAILURE);
+        }
     }
     if (session->requested_mtu > 1492) {
 	sprintf(buffer, "%u", (unsigned int) session->requested_mtu);
+        if (!(mrumtu = strdup(buffer))) {
+            exit(EXIT_FAILURE);
+        }
 	argv[c++] = "mru";
-	argv[c++] = buffer;
+        argv[c++] = mrumtu;
 	argv[c++] = "mtu";
-	argv[c++] = buffer;
+        argv[c++] = mrumtu;
     } else {
 	argv[c++] = "mru";
 	argv[c++] = "1492";
