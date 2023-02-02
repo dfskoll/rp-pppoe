@@ -1158,9 +1158,7 @@ usage(char const *argv0)
     fprintf(stderr, "   -X pidfile     -- Write PID and lock pidfile.\n");
     fprintf(stderr, "   -q /path/pppd  -- Specify full path to pppd.\n");
     fprintf(stderr, "   -Q /path/pppoe -- Specify full path to pppoe.\n");
-#ifdef HAVE_LINUX_KERNEL_PPPOE
     fprintf(stderr, "   -k             -- Use kernel-mode PPPoE.\n");
-#endif
     fprintf(stderr, "   -u             -- Pass 'unit' option to pppd.\n");
     fprintf(stderr, "   -r             -- Randomize session numbers.\n");
     fprintf(stderr, "   -d             -- Debug session creation.\n");
@@ -1206,11 +1204,7 @@ main(int argc, char **argv)
     char const *s;
     int cookie_ok = 0;
 
-#ifndef HAVE_LINUX_KERNEL_PPPOE
-    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:sp:lrudPS:q:Q:H:M:U:";
-#else
-    char *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPS:q:Q:H:M:U:";
-#endif
+    char const *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPS:q:Q:H:M:U:";
 
     if (getuid() != geteuid() ||
 	getgid() != getegid()) {
@@ -1249,11 +1243,9 @@ main(int argc, char **argv)
 	    }
 	    break;
 
-#ifdef HAVE_LINUX_KERNEL_PPPOE
 	case 'k':
 	    UseLinuxKernelModePPPoE = 1;
 	    break;
-#endif
 	case 'S':
 	    if (NumServiceNames == MAX_SERVICE_NAMES) {
 		fprintf(stderr, "Too many '-S' options (%d max)",
