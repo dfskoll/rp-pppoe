@@ -71,6 +71,8 @@ static const char* drain_string[] = {
     "quit (not accepting, will terminate when drained)",
 };
 
+static char *plugin_path = PLUGIN_PATH;
+
 static void PppoeStopSession(ClientSession *ses, char const *reason);
 static int PppoeSessionIsActive(ClientSession *ses);
 
@@ -1159,6 +1161,7 @@ usage(char const *argv0)
     fprintf(stderr, "   -q /path/pppd  -- Specify full path to pppd.\n");
     fprintf(stderr, "   -Q /path/pppoe -- Specify full path to pppoe.\n");
     fprintf(stderr, "   -k             -- Use kernel-mode PPPoE.\n");
+    fprintf(stderr, "   -g path        -- Specify full path to plugin (default %s)\n", PLUGIN_PATH);
     fprintf(stderr, "   -u             -- Pass 'unit' option to pppd.\n");
     fprintf(stderr, "   -r             -- Randomize session numbers.\n");
     fprintf(stderr, "   -d             -- Debug session creation.\n");
@@ -1204,7 +1207,7 @@ main(int argc, char **argv)
     char const *s;
     int cookie_ok = 0;
 
-    char const *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPS:q:Q:H:M:U:";
+    char const *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPS:q:Q:H:M:U:g:";
 
     if (getuid() != geteuid() ||
 	getgid() != getegid()) {
@@ -1246,6 +1249,13 @@ main(int argc, char **argv)
 	case 'k':
 	    UseLinuxKernelModePPPoE = 1;
 	    break;
+        case 'g':
+            plugin_path = strdup(optarg);
+            if (!plugin_path) {
+                fprintf(stderr, "Out of memory\n");
+                exit(EXIT_FAILURE);
+            }
+            break;
 	case 'S':
 	    if (NumServiceNames == MAX_SERVICE_NAMES) {
 		fprintf(stderr, "Too many '-S' options (%d max)",
@@ -1264,7 +1274,7 @@ main(int argc, char **argv)
 
 	    ServiceNames[NumServiceNames] = strdup(optarg);
 	    if (!ServiceNames[NumServiceNames]) {
-		fprintf(stderr, "Out of memory");
+		fprintf(stderr, "Out of memory\n");
 		exit(EXIT_FAILURE);
 	    }
 	    NumServiceNames++;
@@ -1272,14 +1282,14 @@ main(int argc, char **argv)
 	case 'q':
 	    pppd_path = strdup(optarg);
 	    if (!pppd_path) {
-		fprintf(stderr, "Out of memory");
+		fprintf(stderr, "Out of memory\n");
 		exit(EXIT_FAILURE);
 	    }
 	    break;
 	case 'Q':
 	    pppoe_path = strdup(optarg);
 	    if (!pppoe_path) {
-		fprintf(stderr, "Out of memory");
+		fprintf(stderr, "Out of memory\n");
 		exit(EXIT_FAILURE);
 	    }
 	    break;
@@ -1291,7 +1301,7 @@ main(int argc, char **argv)
 	    }
 	    motd_string = strdup(optarg);
 	    if (!motd_string) {
-		fprintf(stderr, "Out of memory");
+		fprintf(stderr, "Out of memory\n");
 		exit(EXIT_FAILURE);
 	    }
 	    break;
@@ -1303,7 +1313,7 @@ main(int argc, char **argv)
 	    }
 	    hurl_string = strdup(optarg);
 	    if (!hurl_string) {
-		fprintf(stderr, "Out of memory");
+		fprintf(stderr, "Out of memory\n");
 		exit(EXIT_FAILURE);
 	    }
 	    break;
@@ -1918,7 +1928,7 @@ startPPPD(ClientSession *session)
     if (UseLinuxKernelModePPPoE) {
 	/* kernel mode */
 	argv[c++] = "plugin";
-	argv[c++] = PLUGIN_PATH;
+	argv[c++] = plugin_path;
 
 	/* Add "nic-" to interface name */
 	snprintf(buffer, SMALLBUF, "nic-%s", session->ethif->name);

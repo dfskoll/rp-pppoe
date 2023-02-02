@@ -181,6 +181,12 @@ This option is available only on Linux kernels 2.4.0 and later, and
 only if the server was built with kernel-mode support.
 
 .TP
+.B \-g path
+The \fB\-g\fR option tells the server the full path to the pppoe.so or
+rp-pppoe.so plugin to use with kernel-mode PPPoE.  If omitted, a compiled-in
+default is used; this default can be displayed using the \fB\-h\fR option.
+
+.TP
 .B \-i
 The \fB\-i\fR option tells the server to completely ignore PADI frames
 if there are no free session slots.
