@@ -258,7 +258,7 @@ sigPADT(int src)
 {
   syslog(LOG_DEBUG,"Received signal %d on session %d.",
 	 (int)src, (int) ntohs(Connection->session));
-  sendPADTf(Connection, "RP-PPPoE: Received signal %d", src);
+  sendPADTf(Connection, "RP-PPPoE: Client terminated by signal %d", src);
   exit(EXIT_SUCCESS);
 }
 

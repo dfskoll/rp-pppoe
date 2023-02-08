@@ -357,7 +357,7 @@ PPPOEDisconnectDevice(void)
     }
     close(conn->sessionSocket);
     if (conn->discoverySocket >= 0) {
-	sendPADT(conn, NULL);
+	sendPADT(conn, "RP-PPPoE: pppd invoked disconnect");
 	close(conn->discoverySocket);
     }
 
