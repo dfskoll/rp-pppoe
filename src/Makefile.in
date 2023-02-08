@@ -218,6 +218,8 @@ clean:
 distclean: clean
 	rm -f Makefile config.h config.cache config.log config.status
 	rm -f libevent/Makefile
+	rm -f 	libevent/Doc/libevent.aux libevent/Doc/libevent.log libevent/Doc/libevent.out libevent/Doc/libevent.pdf	tests/testevent	tests/testevent.o
+	rm -rf autom4te.cache
 
 .PHONY: clean
 
