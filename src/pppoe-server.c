@@ -2270,8 +2270,8 @@ static int handle_status(ClientConnection *client, const char* const* argv, int 
     if (opt[wlen-1] == ' ')
 	--wlen;
 
-    opt_status("active sessions", "%lu", NumActiveSessions);
-    opt_status("maximum sessions", "%lu", NumSessionSlots);
+    opt_status("active sessions", "%zu", NumActiveSessions);
+    opt_status("maximum sessions", "%zu", NumSessionSlots);
     opt_status("sessions per mac", "%d", MaxSessionsPerMac);
     opt_status("interface count", "%d", NumInterfaces);
     opt_status("global drain", "%s", drain_string[draining]);
