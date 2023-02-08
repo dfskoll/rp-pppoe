@@ -35,9 +35,18 @@
 #include "pppoe.h"
 
 #ifdef PLUGIN
+#define HAVE_STDARG_H 1
+#define HAVE_STDBOOL_H 1
+#define HAVE_STDDEF_H 1
 #include "pppd/pppd.h"
 #include "pppd/fsm.h"
 #include "pppd/lcp.h"
+
+#ifdef PPPD_VERSION
+/* New-style pppd API */
+int persist = 1;
+#endif
+
 #else
 int persist = 0;
 #endif
@@ -367,6 +376,9 @@ sendPADI(PPPoEConnection *conn)
     }
 
 #ifdef PLUGIN
+#ifndef MIN
+#define MIN(x,y) ( (x) < (y) ? (x) : (y) )
+#endif
     /* Add our maximum MTU/MRU */
     if (MIN(lcp_allowoptions[0].mru, lcp_wantoptions[0].mru) > ETH_PPPOE_MTU) {
 	PPPoETag maxPayload;
