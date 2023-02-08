@@ -2,8 +2,8 @@
 *
 * pppoe-sniff.c
 *
-* Sniff a network for likely-looking PPPoE frames and deduce the value
-* to supply to PPPOE_EXTRA in /etc/ppp/pppoe.conf.  USE AT YOUR OWN RISK.
+* Sniff a network for likely-looking PPPoE frames and deduce the
+* command-line options to add to pppoe.  USE AT YOUR OWN RISK.
 *
 * Copyright (C) 2000-2018 by Roaring Penguin Software Inc.
 * Copyright (C) 2018-2023 Dianne Skoll
@@ -197,16 +197,16 @@ main(int argc, char *argv[])
     if ((ServiceName == NULL || *ServiceName == 0) &&
 	DiscType == ETH_PPPOE_DISCOVERY &&
 	SessType == ETH_PPPOE_SESSION) {
-	fprintf(stderr, "\nGreat!  It looks like a standard PPPoE service.\nYou should not need anything special in the configuration file.\n");
+	fprintf(stderr, "\nGreat!  It looks like a standard PPPoE service.\nYou should not need any special command-line options.\n");
 	return 0;
     }
 
-    fprintf(stderr, "\nOK, looks like you need something special in the configuration file.\nTry this:\n\n");
+    fprintf(stderr, "\nOK, looks like you need extra arguments for 'pppoe'.\n");
     if (ServiceName != NULL && *ServiceName != 0) {
-	fprintf(stderr, "SERVICENAME='%s'\n", ServiceName);
+	fprintf(stderr, "-S '%s'\n", ServiceName);
     }
     if (DiscType != ETH_PPPOE_DISCOVERY || SessType != ETH_PPPOE_SESSION) {
-	fprintf(stderr, " PPPOE_EXTRA='-f %x:%x'\n", DiscType, SessType);
+	fprintf(stderr, "-f %x:%x\n", DiscType, SessType);
     }
     return 0;
 }

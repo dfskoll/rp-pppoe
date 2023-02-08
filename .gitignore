@@ -1,11 +1,5 @@
 *.bak
 *~
-scripts/pppoe-connect
-scripts/pppoe-init
-scripts/pppoe-init-suse
-scripts/pppoe-setup
-scripts/pppoe-start
-scripts/pppoe-stop
 src/Makefile
 src/autom4te.cache/
 src/common.o
@@ -40,7 +34,3 @@ src/relay.o
 src/rp-pppoe.so
 src/tests/testevent
 src/tests/testevent.o
-gui/Makefile
-gui/pppoe-wrapper
-gui/wrapper.o
-gui/tkpppoe

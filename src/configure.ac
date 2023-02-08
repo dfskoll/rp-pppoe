@@ -213,7 +213,7 @@ AC_SUBST(STATIC)
 datadir_evaluated=`eval echo $datadir`
 AC_SUBST(datadir_evaluated)
 
-AC_CONFIG_FILES([Makefile libevent/Makefile ../scripts/pppoe-connect ../scripts/pppoe-start ../scripts/pppoe-stop ../scripts/pppoe-init ../scripts/pppoe-init-suse ../scripts/pppoe-setup ../gui/Makefile ../gui/tkpppoe $EXTRACONFIGS])
+AC_CONFIG_FILES([Makefile libevent/Makefile $EXTRACONFIGS])
 AC_OUTPUT
 
 AC_MSG_RESULT([On this platform, the following targets will be built:])

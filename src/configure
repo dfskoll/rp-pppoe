@@ -4203,7 +4203,7 @@ LIBEVENT=../libevent
 datadir_evaluated=`eval echo $datadir`
 
 
-ac_config_files="$ac_config_files Makefile libevent/Makefile ../scripts/pppoe-connect ../scripts/pppoe-start ../scripts/pppoe-stop ../scripts/pppoe-init ../scripts/pppoe-init-suse ../scripts/pppoe-setup ../gui/Makefile ../gui/tkpppoe $EXTRACONFIGS"
+ac_config_files="$ac_config_files Makefile libevent/Makefile $EXTRACONFIGS"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4898,14 +4898,6 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "libevent/Makefile") CONFIG_FILES="$CONFIG_FILES libevent/Makefile" ;;
-    "../scripts/pppoe-connect") CONFIG_FILES="$CONFIG_FILES ../scripts/pppoe-connect" ;;
-    "../scripts/pppoe-start") CONFIG_FILES="$CONFIG_FILES ../scripts/pppoe-start" ;;
-    "../scripts/pppoe-stop") CONFIG_FILES="$CONFIG_FILES ../scripts/pppoe-stop" ;;
-    "../scripts/pppoe-init") CONFIG_FILES="$CONFIG_FILES ../scripts/pppoe-init" ;;
-    "../scripts/pppoe-init-suse") CONFIG_FILES="$CONFIG_FILES ../scripts/pppoe-init-suse" ;;
-    "../scripts/pppoe-setup") CONFIG_FILES="$CONFIG_FILES ../scripts/pppoe-setup" ;;
-    "../gui/Makefile") CONFIG_FILES="$CONFIG_FILES ../gui/Makefile" ;;
-    "../gui/tkpppoe") CONFIG_FILES="$CONFIG_FILES ../gui/tkpppoe" ;;
     "$EXTRACONFIGS") CONFIG_FILES="$CONFIG_FILES $EXTRACONFIGS" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

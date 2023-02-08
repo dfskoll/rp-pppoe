@@ -144,67 +144,28 @@ install: all
 	$(install) -m 755 pppoe-server $(DESTDIR)$(sbindir)
 	if test -x pppoe-relay ; then $(install) -m 755 pppoe-relay $(DESTDIR)$(sbindir); fi
 	if test -x pppoe-sniff; then $(install) -m 755 pppoe-sniff $(DESTDIR)$(sbindir); fi
-	$(install) -m 755 ../scripts/pppoe-connect $(DESTDIR)$(sbindir)
-	$(install) -m 755 ../scripts/pppoe-start $(DESTDIR)$(sbindir)
-	$(install) -m 755 ../scripts/pppoe-status $(DESTDIR)$(sbindir)
-	$(install) -m 755 ../scripts/pppoe-stop $(DESTDIR)$(sbindir)
-	$(install) -m 755 ../scripts/pppoe-setup $(DESTDIR)$(sbindir)
 	-mkdir -p $(DESTDIR)$(docdir)
 	$(install) -m 644 ../doc/CHANGES $(DESTDIR)$(docdir)
 	$(install) -m 644 ../doc/KERNEL-MODE-PPPOE $(DESTDIR)$(docdir)
 	$(install) -m 644 ../doc/HOW-TO-CONNECT $(DESTDIR)$(docdir)
 	$(install) -m 644 ../doc/LICENSE $(DESTDIR)$(docdir)
 	$(install) -m 644 ../README.md $(DESTDIR)$(docdir)
-	$(install) -m 644 ../configs/pap-secrets $(DESTDIR)$(docdir)
 	-mkdir -p $(DESTDIR)$(mandir)/man8
 	for i in $(TARGETS) ; do \
 		if test -f ../man/$$i.8 ; then \
 			$(install) -m 644 ../man/$$i.8 $(DESTDIR)$(mandir)/man8 || exit 1; \
 		fi; \
 	done
-	$(install) -m 644 ../man/pppoe-start.8 $(DESTDIR)$(mandir)/man8
-	$(install) -m 644 ../man/pppoe-stop.8 $(DESTDIR)$(mandir)/man8
-	$(install) -m 644 ../man/pppoe-status.8 $(DESTDIR)$(mandir)/man8
-	$(install) -m 644 ../man/pppoe-connect.8 $(DESTDIR)$(mandir)/man8
-	$(install) -m 644 ../man/pppoe-setup.8 $(DESTDIR)$(mandir)/man8
-	-mkdir -p $(DESTDIR)$(mandir)/man5
-	$(install) -m 644 ../man/pppoe.conf.5 $(DESTDIR)$(mandir)/man5
 	-mkdir -p $(DESTDIR)/etc/ppp
 	-mkdir -p $(DESTDIR)$(PLUGIN_DIR)
 	-echo "# Directory created by rp-pppoe for kernel-mode plugin" > $(DESTDIR)$(PLUGIN_DIR)/README
 	if test -r rp-pppoe.so; then $(install) -m 755 rp-pppoe.so $(DESTDIR)$(PLUGIN_DIR); fi
-	@for i in pppoe.conf firewall-standalone firewall-masq ; do \
-		if [ ! -f $(DESTDIR)/etc/ppp/$$i ] ; then \
-			$(install) -m 644 ../configs/$$i $(DESTDIR)/etc/ppp ; \
-		else \
-			echo "NOT overwriting existing $(DESTDIR)/etc/ppp/$$i" ;\
-			$(install) -m 644 ../configs/$$i $(DESTDIR)/etc/ppp/$$i-$(RP_VERSION) ;\
-		fi ;\
-	done
 	@if [ ! -f $(DESTDIR)$(PPPOESERVER_PPPD_OPTIONS) ] ; then \
 		$(install) -m 644 ../configs/pppoe-server-options $(DESTDIR)$(PPPOESERVER_PPPD_OPTIONS) ; \
 	else \
 		echo "NOT overwriting existing $(DESTDIR)$(PPPOESERVER_PPPD_OPTIONS)"; \
 		$(install) -m 644 ../configs/pppoe-server-options $(DESTDIR)$(PPPOESERVER_PPPD_OPTIONS)-example ; \
 	fi
-	@if [ -f /etc/redhat-release ] ; then \
-		echo "Looks like a Red Hat system; installing $(DESTDIR)/etc/rc.d/init.d/pppoe" ; \
-		mkdir -p $(DESTDIR)/etc/rc.d/init.d ;\
-		$(install) -m 755 ../scripts/pppoe-init $(DESTDIR)/etc/rc.d/init.d/pppoe ; \
-	fi
-	@if [ -f /etc/SuSE-release ] ; then \
-		echo "Looks like a SuSE Linux system; installing $(DESTDIR)/etc/rc.d/init.d/pppoe" ; \
-		mkdir -p $(DESTDIR)/etc/rc.d/init.d ;\
-		$(install) -m 755 ../scripts/pppoe-init-suse $(DESTDIR)/etc/rc.d/init.d/pppoe ; \
-	fi
-
-	@echo ""
-	@echo "Type 'pppoe-setup' to configure the software."
-
-servpoet-tgz: distro-servpoet
-	cd .. && tar cvf servpoet-$(RP_VERSION)$(BETA).tar servpoet-$(RP_VERSION)$(BETA)
-	gzip -f -v -9 ../servpoet-$(RP_VERSION)$(BETA).tar
-	rm -rf ../servpoet-$(RP_VERSION)$(BETA)
 
 tgz: distro
 	cd .. && tar cvf rp-pppoe-$(RP_VERSION)$(BETA).tar rp-pppoe-$(RP_VERSION)$(BETA)
@@ -214,35 +175,22 @@ tgz: distro
 distro:
 	rm -rf ../rp-pppoe-$(RP_VERSION)$(BETA)
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)
-	for i in README SERVPOET go rp-pppoe.spec ; do \
-		cp ../$$i ../rp-pppoe-$(RP_VERSION)$(BETA) || exit 1; \
-	done
-	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/gui
-	for i in en.msg ja.msg Makefile.in tkpppoe.in wrapper.c tkpppoe.1 pppoe-wrapper.1 ; do \
-		cp ../gui/$$i ../rp-pppoe-$(RP_VERSION)$(BETA)/gui || exit 1; \
-	done
-	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/gui/html
-	for i in mainwin-busy.png mainwin-nonroot.png mainwin.png props-advanced.png props-basic.png props-nic.png props-options.png tkpppoe.html ; do \
-		cp ../gui/html/$$i ../rp-pppoe-$(RP_VERSION)$(BETA)/gui/html || exit 1; \
-	done
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/configs
-	for i in firewall-masq firewall-standalone pap-secrets pppoe-server-options pppoe.conf ; do \
+	cp ../README.md ../rp-pppoe-$(RP_VERSION)$(BETA)
+	for i in pppoe-server-options ; do \
 		cp ../configs/$$i ../rp-pppoe-$(RP_VERSION)$(BETA)/configs || exit 1; \
 	done
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/doc
-	for i in CHANGES KERNEL-MODE-PPPOE HOW-TO-CONNECT LICENSE PROBLEMS ; do \
+	for i in CHANGES KERNEL-MODE-PPPOE HOW-TO-CONNECT LICENSE ; do \
 		cp ../doc/$$i ../rp-pppoe-$(RP_VERSION)$(BETA)/doc || exit 1; \
 	done
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/man
-	for i in pppoe-connect.8 pppoe-setup.8 pppoe-start.8 pppoe-status.8 pppoe-stop.8 pppoe-server.8 pppoe-sniff.8 pppoe.8 pppoe-relay.8 pppoe.conf.5 ; do \
+	for i in pppoe-server.8 pppoe-sniff.8 pppoe.8 pppoe-relay.8 ; do \
 		cp ../man/$$i ../rp-pppoe-$(RP_VERSION)$(BETA)/man || exit 1; \
 	done
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/scripts
-	for i in pppoe-connect.in pppoe-init-suse.in pppoe-init.in pppoe-setup.in pppoe-start.in pppoe-stop.in pppoe-status ; do \
-		cp ../scripts/$$i ../rp-pppoe-$(RP_VERSION)$(BETA)/scripts || exit 1; \
-	done
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/src
-	for i in Makefile.in install-sh common.c config.h.in configure configure.in debug.c discovery.c if.c md5.c md5.h ppp.c pppoe-server.c pppoe-sniff.c pppoe.c pppoe.h pppoe-server.h plugin.c relay.c relay.h ; do \
+	for i in Makefile.in install-sh common.c config.h.in configure configure.ac debug.c discovery.c if.c md5.c md5.h ppp.c pppoe-server.c pppoe-sniff.c pppoe.c pppoe.h pppoe-server.h plugin.c relay.c relay.h control_socket.c control_socket.h ; do \
 		cp ../src/$$i ../rp-pppoe-$(RP_VERSION)$(BETA)/src || exit 1; \
 	done
 	mkdir ../rp-pppoe-$(RP_VERSION)$(BETA)/src/libevent
@@ -263,19 +211,6 @@ beta-check:
 		exit 1; \
 	fi
 
-rpms: tgz
-	cp ../rp-pppoe-$(RP_VERSION).tar.gz /usr/src/redhat/SOURCES
-	gpg --detach-sign /usr/src/redhat/SOURCES/rp-pppoe-$(RP_VERSION).tar.gz
-	cd ..; \
-	rpm -ba rp-pppoe.spec
-	rpm --addsign /usr/src/redhat/SRPMS/rp-pppoe-$(RP_VERSION)-1.src.rpm \
-		/usr/src/redhat/RPMS/i386/rp-pppoe-$(RP_VERSION)-1.i386.rpm \
-		/usr/src/redhat/RPMS/i386/rp-pppoe-gui-$(RP_VERSION)-1.i386.rpm
-
-servpoet-rpms: servpoet-tgz
-	cp ../servpoet-$(RP_VERSION).tar.gz /usr/src/redhat/SOURCES
-	cd .. && rpm -ba servpoet.spec
-
 clean:
 	rm -f *.o pppoe-relay pppoe pppoe-sniff pppoe-server core rp-pppoe.so plugin/*.o plugin/libplugin.a *~
 	test -f libevent/Makefile && $(MAKE) -C libevent clean || true
@@ -283,25 +218,10 @@ clean:
 distclean: clean
 	rm -f Makefile config.h config.cache config.log config.status
 	rm -f libevent/Makefile
-	rm -f ../scripts/pppoe-connect ../scripts/pppoe-start ../scripts/pppoe-stop ../scripts/pppoe-init ../scripts/pppoe-setup ../scripts/pppoe-init-suse
-
-update-version:
-	sed -e 's/^Version: .*$$/Version: $(RP_VERSION)/' ../rp-pppoe.spec > ../rp-pppoe.spec.new && mv ../rp-pppoe.spec.new ../rp-pppoe.spec
-	sed -e 's+^Source: .*$$+Source: https://dianne.skoll.ca/projects/rp-pppoe/download/rp-pppoe-$(RP_VERSION).tar.gz+' ../rp-pppoe.spec > ../rp-pppoe.spec.new && mv ../rp-pppoe.spec.new ../rp-pppoe.spec
-	test -f ../servpoet.spec && sed -e 's/^Version: .*$$/Version: $(RP_VERSION)/' ../servpoet.spec > ../servpoet.spec.new && mv ../servpoet.spec.new ../servpoet.spec || true
-	test -f ../servpoet.spec && sed -e 's+^Source: .*$$+Source: https://dianne.skoll.ca/projects/rp-pppoe/download/servpoet-$(RP_VERSION).tar.gz+' ../servpoet.spec > ../servpoet.spec.new && mv ../servpoet.spec.new ../servpoet.spec || true
-
-# Convenience target for Dianne!  Don't try to use this one.
-km:
-	./configure --enable-plugin=/home/dfs/Archive/PPP/ppp-2.4.0.pppoe4-patched-dfs
-
-.PHONY: update-version
 
 .PHONY: clean
 
 .PHONY: distclean
-
-.PHONY: rpms
 
 .PHONY: distro
 
