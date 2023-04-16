@@ -1,5 +1,39 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+Changes from version 3.15 to 4.0:
+
+- SPDX-License-Identifier: tags added to most source files
+
+- rp-pppoe.so plugin: Modified to compile against both pppd >= 2.5.0 and
+  pppd < 2.5.0.
+
+- pppoe-server: If -L or -R option is specified as 0.0.0.0, then IP allocation
+  is delegated to pppd.
+
+- pppoe-server: New -g option specifies the path of the rp-pppoe.so plugin to
+  use with pppd in kernel-mode PPPoE.
+
+- pppoe-server: New -U option specifies a UNIX-domain control socket.  This
+  lets you send control commands to the server while it is running; see the
+  pppoe-server man page for details.
+
+- All source code: Many cleanups and use of standard types like uint16_t rather
+  than ones we define.
+
+- All source code: Support for OSes other than Linux has been dropped.
+
+- Documentation: Updated fro modern Linux systems.
+
+- Cleanup: The following old and obsolete files have been removed:
+  - Old connection scripts scripts/pppoe-connect.in, scripts/pppoe-start.in,
+    scripts/pppoe-init-suse.in, scripts/pppoe-setup.in, scripts/pppoe-status,
+    scripts/pppoe-init.in, and scripts/pppoe-stop.in
+  - Obsolete firewall scripts configs/firewall-standalone and
+    configs/firewall-masq
+  - Obsolete configuration files configs/pppoe.conf and configs/pap-secrets
+  - The Tcl/Tk gui script gui/tkpppoe.in and supporting files
+  - The RPM spec file rp-pppoe.spec
+
 Changes from version 3.14 to 3.15:
 
 - Release 3.15 (2021-05-07)
