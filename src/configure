@@ -3088,7 +3088,7 @@ $as_echo "no" >&6; }
 fi
 
   if test "x$ac_ct_AR" = x; then
-    AR="/bin/false"
+    AR=""
   else
     case $cross_compiling:$ac_tool_warned in
 yes:)
@@ -3102,6 +3102,10 @@ else
   AR="$ac_cv_prog_AR"
 fi
 
+
+if test "no$AR" = no ; then
+	as_fn_error $? "ar is a required program" "$LINENO" 5
+fi
 
 
 

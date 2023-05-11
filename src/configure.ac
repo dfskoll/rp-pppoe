@@ -13,7 +13,11 @@ AC_PREFIX_DEFAULT(/usr)
 dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_RANLIB
-AC_CHECK_TOOL([AR],[ar],[/bin/false])
+AC_CHECK_TOOL([AR],[ar])
+
+if test "no$AR" = no ; then
+	AC_ERROR(ar is a required program)
+fi
 
 dnl Checks for libraries.
 
