@@ -1170,6 +1170,8 @@ usage(char const *argv0)
     fprintf(stderr, "   -i             -- Ignore PADI if no free sessions.\n");
     fprintf(stderr, "   -M msg         -- Send MSG in a MOTM tag in PADM packet after PADS.\n");
     fprintf(stderr, "   -H url         -- Send URL in a HURL tag in PADM packet after PADS.\n");
+    fprintf(stderr, "   -F             -- Run in foreground.\n");
+    fprintf(stderr, "   -U socket      -- Use control socket.\n");
     fprintf(stderr, "   -h             -- Print usage information.\n\n");
     fprintf(stderr, "PPPoE-Server Version %s, Copyright (C) 2001-2009 Roaring Penguin Software Inc.\n", RP_VERSION);
     fprintf(stderr, "                     %*s  Copyright (C) 2018-2023 Dianne Skoll\n", (int) strlen(RP_VERSION), "");
