@@ -26,6 +26,13 @@
 #include <net/if.h>
 #endif
 
+typedef struct {
+    /* -1 on int fields implies "use global" */
+    int draining;
+    int ignore_service_name;
+} InterfaceConfig;
+
+
 #define MAX_USERNAME_LEN 31
 /* An Ethernet interface */
 typedef struct {
@@ -34,7 +41,16 @@ typedef struct {
     unsigned char mac[ETH_ALEN]; /* MAC address */
     EventHandler *eh;		/* Event handler for this interface */
     uint16_t mtu;               /* MTU of interface */
+    InterfaceConfig config;     /* Interface specific configuration */
 } Interface;
+
+#define interface_get_config_int(interface, field)	(((interface).config.field < 0) ? globalconfig.field : (interface).config.field)
+
+static inline void interface_config_init(Interface *interf)
+{
+    interf->config.draining = -1;
+    interf->config.ignore_service_name = -1;
+}
 
 #define FLAG_RECVD_PADT      1
 #define FLAG_USER_SET        2
