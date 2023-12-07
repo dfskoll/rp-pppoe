@@ -146,7 +146,7 @@ hash_find(hash_table *tab,
 * %RETURNS:
 *  A pointer to the next equal item in the hash table, or NULL if no such item
 * %DESCRIPTION:
-*  Searches hash table for anoter item equivalent to this one.  Search
+*  Searches hash table for another item equivalent to this one.  Search
 *  starts from item.
 ***********************************************************************/
 void *

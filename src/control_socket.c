@@ -2,7 +2,7 @@
 *
 * control_socket.c
 *
-* Re-usable code for implementing a control socket.
+* Reusable code for implementing a control socket.
 *
 * Copyright (C) 2000-2012 Roaring Penguin Software Inc.
 * Copyright (C) 2018-2023 Dianne Skoll

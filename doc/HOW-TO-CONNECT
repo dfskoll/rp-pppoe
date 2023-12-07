@@ -26,7 +26,7 @@ should display something like this:
 	2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast qlen 1000
     link/ether fc:aa:15:39:a7:b3 brd ff:ff:ff:ff:ff:ff
 
-Your second line will most definately be different.  As long as you see
+Your second line will most definitely be different.  As long as you see
 the link/ether line, your card should be working.
 
 2. Edit pap-secrets or chap-secrets
