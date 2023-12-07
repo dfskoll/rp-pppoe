@@ -35,7 +35,7 @@ provides a more pleasant interface for programmers.
   a timer.
 \item \textit{Synchronous signal-handling}, which is the ability to
   defer signal-handling to a safe point in the event-handling loop.
-\item \textit{Syncronous child cleanup}, which lets you defer calls
+\item \textit{Synchronous child cleanup}, which lets you defer calls
   to \name{wait} or \name{waitpid} to a safe point in the event-handling
   loop.
 \end{itemize}
@@ -375,7 +375,7 @@ Connection establishment, and data transfer.
   \>\type{int} \param{fd},\\
   \>\type{EventTcpAcceptFunc} \param{f})}
 {Creates an event handler to accept incoming connections on the listening
-  descriptor \param{fd}.  Each time an incomming connection is accepted,
+  descriptor \param{fd}.  Each time an incoming connection is accepted,
   the function \param{f} is called.}
 {An \Eh{} on success; NULL on failure.}
 \begin{itemize}
@@ -433,7 +433,7 @@ Connection establishment, and data transfer.
     \name{EventTcp\_Connect}.
   \end{itemize}
 \item \param{timeout} -- a timeout value in seconds.  If \name{connect} does
-  not complete withing \param{timeout} seconds, the \param{f} is called
+  not complete within \param{timeout} seconds, the \param{f} is called
   with a flag of \param{EVENT\_TCP\_FLAG\_TIMEOUT}.
 \item \param{data} -- an opaque pointer passed unchanged to \param{f}.
 \end{itemize}

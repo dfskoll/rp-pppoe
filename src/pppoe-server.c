@@ -384,7 +384,7 @@ parseAddressPool(char const *fname, int install)
 	    numAddrs++;
 	} else if ((sscanf(line, "%u.%u.%u.%u-%u", &a, &b, &c, &d, &e) == 5) &&
 		   a < 256 && b < 256 && c < 256 && d < 256 && e < 256) {
-	    /* Remote specied as a.b.c.d-e.  Example: 1.2.3.4-8 yields:
+	    /* Remote specified as a.b.c.d-e.  Example: 1.2.3.4-8 yields:
 	       1.2.3.4, 1.2.3.5, 1.2.3.6, 1.2.3.7, 1.2.3.8 */
 	    /* Swap d and e so that e >= d */
 	    if (e < d) {
@@ -2192,7 +2192,7 @@ pppoe_free_session(ClientSession *ses)
 * %RETURNS:
 *  Nothing
 * %DESCRIPTION:
-*  Sends a PADM packet contaning a HURL or MOTM tag to the victim...er, peer.
+*  Sends a PADM packet containing a HURL or MOTM tag to the victim...er, peer.
 ***********************************************************************/
 void
 sendHURLorMOTM(PPPoEConnection *conn, char const *url, uint16_t tag)

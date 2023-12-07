@@ -194,7 +194,7 @@ usage(char const *argv0)
     fprintf(stderr, "   -S if_name     -- Specify interface for PPPoE Server\n");
     fprintf(stderr, "   -C if_name     -- Specify interface for PPPoE Client\n");
     fprintf(stderr, "   -B if_name     -- Specify interface for both clients and server\n");
-    fprintf(stderr, "   -n nsess       -- Maxmimum number of sessions to relay\n");
+    fprintf(stderr, "   -n nsess       -- Maximum number of sessions to relay\n");
     fprintf(stderr, "   -i timeout     -- Idle timeout in seconds (0 = no timeout)\n");
     fprintf(stderr, "   -F             -- Do not fork into background\n");
     fprintf(stderr, "   -h             -- Print this help message\n");
@@ -1038,7 +1038,7 @@ relayHandlePADI(PPPoEInterface const *iface,
 	if (r < 0) return;
 	size += r;
     } else {
-	/* We do not re-use relay-id tags.  Drop the frame.  The RFC says the
+	/* We do not reuse relay-id tags.  Drop the frame.  The RFC says the
 	   relay agent SHOULD return a Generic-Error tag, but this does not
 	   make sense for PADI packets. */
 	return;
@@ -1389,7 +1389,7 @@ relayHandlePADS(PPPoEInterface const *iface,
 	return;
     }
 
-    /* If session ID is zero, it's the AC respoding with an error.
+    /* If session ID is zero, it's the AC responding with an error.
        Just relay it; do not create a session */
     if (packet->session != htons(0)) {
 	/* Check for existing session */

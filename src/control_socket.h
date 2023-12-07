@@ -21,7 +21,7 @@ typedef struct ClientConnection ClientConnection;
 /* command control structures */
 typedef struct ControlCommand {
     const char* command; /* single word such as 'set' */
-    int (*handler)(struct ClientConnection* cc, const char * const * argv, int argi, void* cmdpvt, void* clientpvt); /* argv contains word-split command, argi the index that needs to be handled next, zero return indicates success, negative return states to close the socket, positive values indicates that there was a proccessing failure and further processing should stop, but the connection can be retained. fd is a file descriptor to the control socket. */
+    int (*handler)(struct ClientConnection* cc, const char * const * argv, int argi, void* cmdpvt, void* clientpvt); /* argv contains word-split command, argi the index that needs to be handled next, zero return indicates success, negative return states to close the socket, positive values indicates that there was a processing failure and further processing should stop, but the connection can be retained. fd is a file descriptor to the control socket. */
     void* pvt;
 } ControlCommand;
 

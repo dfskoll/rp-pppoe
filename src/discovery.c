@@ -536,7 +536,7 @@ waitForPADO(PPPoEConnection *conn, int timeout)
 /***********************************************************************
 *%FUNCTION: sendPADR
 *%ARGUMENTS:
-* conn -- PPPoE connection structur
+* conn -- PPPoE connection structure
 *%RETURNS:
 * Nothing
 *%DESCRIPTION:

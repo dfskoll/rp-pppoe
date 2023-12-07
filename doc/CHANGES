@@ -24,7 +24,7 @@ Changes from version 3.15 to 4.0:
 
 - All source code: Support for OSes other than Linux has been dropped.
 
-- Documentation: Updated fro modern Linux systems.
+- Documentation: Updated for modern Linux systems.
 
 - Cleanup: The following old and obsolete files have been removed:
   - Old connection scripts scripts/pppoe-connect.in, scripts/pppoe-start.in,
@@ -97,7 +97,7 @@ Changes from version 3.12 to 3.13:
 
 - Fix potential use-after-free bug
 
-- Properly detecte kernel-mode PPPoE; fix compilation problems on
+- Properly detect kernel-mode PPPoE; fix compilation problems on
   Debian Jessie and Debian Stretch.
 
 Changes from version 3.11 to 3.12:
