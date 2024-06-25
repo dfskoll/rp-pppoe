@@ -131,15 +131,7 @@ dnl Check for Linux-specific kernel support for PPPoE
 AC_MSG_CHECKING(for Linux 2.4.X kernel-mode PPPoE support)
 AC_CACHE_VAL(ac_cv_linux_kernel_pppoe,[
 if test "`uname -s`" = "Linux" ; then
-if test $cross_compiling = "no"; then
 
-dnl Do a bunch of modprobes.  Can't hurt; might help.
-modprobe ppp_generic > /dev/null 2>&1
-modprobe ppp_async > /dev/null 2>&1
-modprobe n_hdlc > /dev/null 2>&1
-modprobe ppp_synctty > /dev/null 2>&1
-modprobe pppoe > /dev/null 2>&1
-fi
 AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>

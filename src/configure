@@ -4103,14 +4103,7 @@ if ${ac_cv_linux_kernel_pppoe+:} false; then :
 else
 
 if test "`uname -s`" = "Linux" ; then
-if test $cross_compiling = "no"; then
 
-modprobe ppp_generic > /dev/null 2>&1
-modprobe ppp_async > /dev/null 2>&1
-modprobe n_hdlc > /dev/null 2>&1
-modprobe ppp_synctty > /dev/null 2>&1
-modprobe pppoe > /dev/null 2>&1
-fi
 if test "$cross_compiling" = yes; then :
   ac_cv_linux_kernel_pppoe=no; echo "cross-compiling, default: "
 else
