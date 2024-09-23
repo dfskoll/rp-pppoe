@@ -55,7 +55,7 @@ if test "$ac_cv_n_hdlc" = yes ; then
 AC_DEFINE(HAVE_N_HDLC)
 fi
 
-AC_ARG_ENABLE(plugin, [  --enable-plugin=pppd_src_path   build pppd plugin], ac_cv_pluginpath=$enableval, ac_cv_pluginpath=no)
+AC_ARG_ENABLE(plugin, [  --enable-plugin=pppd_src_path   build pppd plugin], ac_cv_pluginpath=$enableval, ac_cv_pluginpath=yes)
 AC_ARG_ENABLE(debugging, [  --disable-debugging             disable debugging code], ac_cv_debugging=$enableval, ac_cv_debugging=yes)
 AC_ARG_ENABLE(static, [  --enable-static                 Build static executables], ac_cv_static=$enableval, ac_cv_static=no)
 
