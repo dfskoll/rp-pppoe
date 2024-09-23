@@ -157,6 +157,9 @@ openInterface(char const *ifname, uint16_t type, unsigned char *hwaddr, uint16_t
     sa.sll_ifindex = ifr.ifr_ifindex;
 
 #else
+    if (strlen(ifname) >= sizeof(sa.sa_data)) {
+        rp_fatal("Interface name too long");
+    }
     strcpy(sa.sa_data, ifname);
 #endif
 
@@ -192,6 +195,9 @@ sendPacket(PPPoEConnection *conn, int sock, PPPoEPacket *pkt, int size)
 
     if (!conn) {
 	rp_fatal("relay and server not supported on Linux 2.0 kernels");
+    }
+    if (strlen(conn->ifName) >= sizeof(sa.sa_data)) {
+        rp_fatal("Interface name too long");
     }
     strcpy(sa.sa_data, conn->ifName);
     if (sendto(sock, pkt, size, 0, &sa, sizeof(sa)) < 0) {
