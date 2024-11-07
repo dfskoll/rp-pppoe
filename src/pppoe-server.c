@@ -99,6 +99,8 @@ int NumInterfaces = 0;
 int MaxInterfaces = 0;
 int draining = 0;
 
+int vendorTagAsRemoteNumber = 0; /* 0 is disabled, 1 use "Agent Circuit ID", 2 use "Agent Remote ID". */
+
 /* The number of session slots */
 size_t NumSessionSlots;
 
@@ -176,6 +178,7 @@ static PPPoETag hostUniq;
 static PPPoETag relayId;
 static PPPoETag receivedCookie;
 static PPPoETag requestedService;
+static PPPoETag vendorTag;
 
 #define HOSTNAMELEN 256
 
@@ -514,6 +517,14 @@ parsePADRTags(uint16_t type, uint16_t len, unsigned char *data,
 	requestedService.length = htons(len);
 	memcpy(requestedService.payload, data, len);
 	break;
+    case TAG_VENDOR_SPECIFIC:
+	/* We only care about vendor 0x00000DE9 ("BBF" aka Broadband Forum, IANA) */
+	if (len >= 4 && *(uint32_t*)data == htonl(0xDE9)) {
+	    vendorTag.type = htons(type);
+	    vendorTag.length = htons(len);
+	    memcpy(vendorTag.payload, data, len);
+	}
+        break;
     }
 }
 
@@ -881,6 +892,7 @@ processPADR(Interface *ethif, PPPoEPacket *packet, int len)
     hostUniq.type = 0;
     receivedCookie.type = 0;
     requestedService.type = 0;
+    vendorTag.type = 0;
 
     /* Ignore PADR's not directed at us */
     if (memcmp(packet->ethHdr.h_dest, myAddr, ETH_ALEN)) return;
@@ -979,6 +991,7 @@ processPADR(Interface *ethif, PPPoEPacket *packet, int len)
     cliSession->funcs = &DefaultSessionFunctionTable;
     cliSession->startTime = time(NULL);
     cliSession->serviceName = serviceName;
+    cliSession->remoteNumber = NULL;
 
     /* Create child process, send PADS packet back */
     child = fork();
@@ -1070,6 +1083,32 @@ processPADR(Interface *ethif, PPPoEPacket *packet, int len)
 	memcpy(cursor, &hostUniq, ntohs(hostUniq.length) + TAG_HDR_SIZE);
 	cursor += ntohs(hostUniq.length) + TAG_HDR_SIZE;
 	plen += ntohs(hostUniq.length) + TAG_HDR_SIZE;
+    }
+    if (vendorTag.type && vendorTag.length && vendorTagAsRemoteNumber) {
+	/* we know the Vendor-ID (32 bits) is 0xDE9, we can skip that */
+	int len = ntohs(vendorTag.length) - 4;
+	char* parse = (char*)vendorTag.payload + 4;
+
+	while (len >= 2) {
+	    uint8_t tag = parse[0];
+	    uint8_t tlen = parse[1];
+
+	    parse += 2;
+	    len -= 2;
+
+	    /* corrupted packet, or malicious manipulation */
+	    if (tlen > len)
+		break;
+
+	    if (tag == vendorTagAsRemoteNumber) {
+		/* correct variant */
+		cliSession->remoteNumber = strndup(parse, tlen);
+		break;
+	    }
+
+	    len -= tlen;
+	    parse += tlen;
+	}
     }
     pads.length = htons(plen);
     sendPacket(NULL, sock, &pads, (int) (plen + HDR_SIZE));
@@ -1209,7 +1248,7 @@ main(int argc, char **argv)
     char const *s;
     int cookie_ok = 0;
 
-    char const *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPS:q:Q:H:M:U:g:";
+    char const *options = "X:ix:hI:C:L:R:T:m:FN:f:O:o:skp:lrudPS:q:Q:H:M:U:g:n:";
 
     if (getuid() != geteuid() ||
 	getgid() != getegid()) {
@@ -1455,6 +1494,18 @@ main(int argc, char **argv)
 
 	case 'U':
 	    SET_STRING(unix_control, optarg);
+	    break;
+
+	case 'n':
+	    if (sscanf(optarg, "%d", &opt) != 1) {
+		usage(argv[0]);
+		exit(EXIT_FAILURE);
+	    }
+	    if (opt < 0 || opt > 2) {
+		fprintf(stderr, "-n: Value must be in the range 0 to 2\n");
+		exit(EXIT_FAILURE);
+	    }
+	    vendorTagAsRemoteNumber = opt;
 	    break;
 
 	case 'h':
@@ -1989,11 +2040,17 @@ startPPPD(ClientSession *session)
     argv[c++] = "default-asyncmap";
 
     argv[c++] = "remotenumber";
-    snprintf(buffer, SMALLBUF, "%02x:%02x:%02x:%02x:%02x:%02x",
-	    session->eth[0], session->eth[1], session->eth[2],
-	    session->eth[3], session->eth[4], session->eth[5]);
-    if (!(argv[c++] = strdup(buffer))) {
-	exit(EXIT_FAILURE);
+    if (session->remoteNumber) {
+	if (!(argv[c++] = strdup(session->remoteNumber))) {
+	    exit(EXIT_FAILURE);
+	}
+    } else {
+	snprintf(buffer, SMALLBUF, "%02x:%02x:%02x:%02x:%02x:%02x",
+		session->eth[0], session->eth[1], session->eth[2],
+		session->eth[3], session->eth[4], session->eth[5]);
+	if (!(argv[c++] = strdup(buffer))) {
+	    exit(EXIT_FAILURE);
+	}
     }
 
     if (PassUnitOptionToPPPD) {
@@ -2178,6 +2235,8 @@ pppoe_free_session(ClientSession *ses)
     ses->pid = 0;
     memset(ses->eth, 0, ETH_ALEN);
     ses->flags = 0;
+    free(ses->remoteNumber);
+    ses->remoteNumber = NULL;
     NumActiveSessions--;
     return 0;
 }
