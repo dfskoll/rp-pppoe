@@ -243,7 +243,6 @@ childHandler(pid_t pid, int status, void *s)
     PPPoEConnection conn;
 
     memset(&conn, 0, sizeof(conn));
-    conn.hostUniq = NULL;
 
     syslog(LOG_INFO,
 	   "Session %u closed for client "
@@ -1076,7 +1075,6 @@ processPADR(Interface *ethif, PPPoEPacket *packet, int len)
 
     if (hurl_string || motd_string) {
 	memset(&conn, 0, sizeof(conn));
-	conn.hostUniq = NULL;
 
 	memcpy(conn.myEth, cliSession->ethif->mac, ETH_ALEN);
 	conn.discoverySocket = sock;
@@ -1681,7 +1679,7 @@ main(int argc, char **argv)
 	if (chdir("/") < 0) {
 	    fatalSys("chdir");
 	}
-	
+
 	if (KidPipe[0] >= 0) {
 	    close(KidPipe[0]);
 	    KidPipe[0] = -1;
@@ -1743,10 +1741,10 @@ main(int argc, char **argv)
 
     /* Tell parent all is cool */
     if (KidPipe[1] >= 0) {
-#pragma GCC diagnostic ignored "-Wunused-result"      
+#pragma GCC diagnostic ignored "-Wunused-result"
 	write(KidPipe[1], "X", 1);
 	close(KidPipe[1]);
-#pragma GCC diagnostic warning "-Wunused-result"      
+#pragma GCC diagnostic warning "-Wunused-result"
 	KidPipe[1] = -1;
     }
 
@@ -2062,7 +2060,6 @@ PppoeStopSession(ClientSession *ses,
     PPPoEConnection conn;
 
     memset(&conn, 0, sizeof(conn));
-    conn.hostUniq = NULL;
 
     memcpy(conn.myEth, ses->ethif->mac, ETH_ALEN);
     conn.discoverySocket = ses->ethif->sock;
