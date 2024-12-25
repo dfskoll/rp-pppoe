@@ -97,7 +97,10 @@ ClientSession *BusySessions = NULL;
 Interface *interfaces = NULL;
 int NumInterfaces = 0;
 int MaxInterfaces = 0;
-int draining = 0;
+static InterfaceConfig globalconfig = {
+	.draining = DRAIN_OFF,
+	.ignore_service_name = 0,
+};
 
 /* The number of session slots */
 size_t NumSessionSlots;
@@ -622,7 +625,7 @@ processPADI(Interface *ethif, PPPoEPacket *packet, int len)
     unsigned char *myAddr = ethif->mac;
 
     /* Ignore PADI's if we're draining the server */
-    if (draining != DRAIN_OFF) {
+    if (interface_get_config_int(*ethif, draining) != DRAIN_OFF) {
 	syslog(LOG_ERR, "PADI ignored due to server draining.");
 	return;
     }
@@ -686,7 +689,7 @@ processPADI(Interface *ethif, PPPoEPacket *packet, int len)
 	ok = 1;			/* No Service-Name tag in PADI */
     }
 
-    if (!ok) {
+    if (!ok && !interface_get_config_int(*ethif, ignore_service_name)) {
 	/* PADI asked for unsupported service */
 	return;
     }
@@ -1415,6 +1418,7 @@ main(int argc, char **argv)
 	    if (!found) {
 		memset(&interfaces[NumInterfaces], 0, sizeof(*interfaces));
 		strncpy(interfaces[NumInterfaces].name, optarg, IFNAMSIZ);
+		interface_config_init(&interfaces[NumInterfaces]);
 		NumInterfaces++;
 	    }
 	    break;
@@ -1754,7 +1758,7 @@ main(int argc, char **argv)
 	    fatalSys("Event_HandleEvent");
 	}
 
-	if (draining == DRAIN_QUIT && NumActiveSessions == 0) {
+	if (globalconfig.draining == DRAIN_QUIT && NumActiveSessions == 0) {
 	    syslog(LOG_INFO, "All active sessions are terminated and draining is set to quit.");
 	    pppoe_terminate();
 	}
@@ -2273,7 +2277,8 @@ static int handle_status(ClientConnection *client, const char* const* argv, int 
     opt_status("maximum sessions", "%zu", NumSessionSlots);
     opt_status("sessions per mac", "%d", MaxSessionsPerMac);
     opt_status("interface count", "%d", NumInterfaces);
-    opt_status("global drain", "%s", drain_string[draining]);
+    opt_status("global drain", "%s", drain_string[globalconfig.draining]);
+    opt_status("global service name ignore", "%s", globalconfig.ignore_service_name ? "ignore" : "honour");
     if (opt_matches("interface list")) {
         int i;
 	for (i = 0; i < NumInterfaces; ++i) {
@@ -2284,6 +2289,8 @@ static int handle_status(ClientConnection *client, const char* const* argv, int 
 		    interfaces[i].mac[0], interfaces[i].mac[1], interfaces[i].mac[2],
 		    interfaces[i].mac[3], interfaces[i].mac[4], interfaces[i].mac[5]);
 	    opt_outp("mtu", "%u", interfaces[i].mtu);
+	    opt_outp("drain", "%s", drain_string[interface_get_config_int(interfaces[i], draining)]);
+	    opt_outp("service name ignore", "%s", interface_get_config_int(interfaces[i], ignore_service_name) ? "ignore" : "honour");
 	}
     }
     cs_ret_printf(client, "-- end --\n");
@@ -2304,13 +2311,13 @@ static int handle_set_drain(ClientConnection *client, const char* const* argv, i
     }
 
     if (strcmp(argv[argi], "off") == 0) {
-	draining = DRAIN_OFF;
+	globalconfig.draining = DRAIN_OFF;
 	cs_ret_printf(client, "Server is not draining\n");
     } else if (strcmp(argv[argi], "on") == 0) {
-	draining = DRAIN_ON;
+	globalconfig.draining = DRAIN_ON;
 	cs_ret_printf(client, "Server is now draining\n");
     } else if (strcmp(argv[argi], "quit") == 0) {
-	draining = DRAIN_QUIT;
+	globalconfig.draining = DRAIN_QUIT;
 	cs_ret_printf(client, "Server is now draining, and will quit when all clients are disconnected\n");
     } else {
 	cs_ret_printf(client, "Invalid value %s for set drain, value must be one of off, on or quit.\n", argv[argi]);
