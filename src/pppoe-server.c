@@ -34,6 +34,7 @@
 #include <getopt.h>
 #include <sys/wait.h>
 #include <sys/time.h>
+#include <ctype.h>
 
 #include <time.h>
 #include <signal.h>
@@ -1266,8 +1267,8 @@ main(int argc, char **argv)
             /* Service names can only be [-_.A-Za-z0-9/] for shell-escaping
                safety reasons */
             for (s=optarg; *s; s++) {
-                if (!strchr("-_.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/:@=", *s)) {
-                    fprintf(stderr, "Illegal character `%c' in service-name: Must be A-Z, a-z, 0-9 or one of ./-_:@=\n", *s);
+                if (!isprint(*s)) {
+                    fprintf(stderr, "Illegal service-name: characters must be from the printable ASCII set\n");
                     exit(EXIT_FAILURE);
                 }
             }
