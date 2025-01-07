@@ -34,6 +34,7 @@
 #include <getopt.h>
 #include <sys/wait.h>
 #include <sys/time.h>
+#include <ctype.h>
 
 #include <time.h>
 #include <signal.h>
@@ -1263,11 +1264,17 @@ main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	    }
 
-            /* Service names can only be [-_.A-Za-z0-9/] for shell-escaping
-               safety reasons */
+	    /* The RFC says that Service-Name can be any UTF-8 string. The
+	       below will blindly skip over anything that has the
+	       most-significant bit set, thus only inspecting base ASCII
+	       characters and ignoring UTF-8 multibyte characters, whether or
+	       not they're valid isn't taken into consideration.  For the ASCII
+	       characters we will simply error out if we find control
+	       characters (non-printables), and we ban ' for the time being as
+	       it causes escaping issues for pppd. */
             for (s=optarg; *s; s++) {
-                if (!strchr("-_.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/:@=", *s)) {
-                    fprintf(stderr, "Illegal character `%c' in service-name: Must be A-Z, a-z, 0-9 or one of ./-_:@=\n", *s);
+                if (!(*s & 0x80 || isprint(*s)) || *s == '\'') {
+                    fprintf(stderr, "Illegal service-name: characters must be from the printable ASCII set\n");
                     exit(EXIT_FAILURE);
                 }
             }
