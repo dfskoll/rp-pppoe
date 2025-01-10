@@ -78,6 +78,7 @@ typedef struct ClientSessionStruct {
     time_t startTime;		/* When session started */
     char const *serviceName;	/* Service name */
     uint16_t requested_mtu;     /* Requested PPP_MAX_PAYLOAD  per RFC 4638 */
+    char *remoteNumber;    /* Vendor-Specific tag extracted remote number ... this is a bit of a hack */
 } ClientSession;
 
 /* Hack for daemonizing */
