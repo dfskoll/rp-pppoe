@@ -1274,7 +1274,7 @@ main(int argc, char **argv)
 	       it causes escaping issues for pppd. */
             for (s=optarg; *s; s++) {
                 if (!(*s & 0x80 || isprint(*s)) || *s == '\'') {
-                    fprintf(stderr, "Illegal service-name: characters must be from the printable ASCII set\n");
+                    fprintf(stderr, "Illegal service-name: Cannot contain \"'\" or non-printable characters\n");
                     exit(EXIT_FAILURE);
                 }
             }
